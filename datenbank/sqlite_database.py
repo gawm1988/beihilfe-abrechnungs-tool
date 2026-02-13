@@ -1,15 +1,18 @@
 import sqlite3
+import os
 
 def connect():
-    conn = sqlite3.connect("beihilfe.db")
-    return conn
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DB_PATH = os.path.join(BASE_DIR, "datenbank/beihilfe.db")
+    return sqlite3.connect(DB_PATH)
+
 
 def create_tabellen():
     conn = connect()
     cursor = conn.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS person (id INTEGER PRIMARY KEY, vorname TEXT NOT NULL, nachname TEXT NOT NULL, beihilfesatz REAL)")
     cursor.execute("CREATE TABLE IF NOT EXISTS leistungsbringer (id INTEGER PRIMARY KEY, name TEXT NOT NULL, iban TEXT)")
-    cursor.execute("CREATE TABLE IF NOT EXISTS rechnung (id INTEGER PRIMARY KEY, person_id INTEGER NOT NULL, leistungsbringer_id INTEGER NOT NULL, betrag REAL NOT NULL, verwendungszweck TEXT NOT NULL, abrechnungsdatum DATE)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS rechnung (id INTEGER PRIMARY KEY, person_id INTEGER NOT NULL, leistungsbringer_id INTEGER NOT NULL, rechnungsdatum DATE NOT NULL, betrag REAL NOT NULL, verwendungszweck TEXT NOT NULL, abrechnungsdatum DATE)")
     conn.commit()
     conn.close()
 
@@ -73,7 +76,7 @@ def update_iban_leistungserbringer(name:str, iban:str):
     if iban == None or iban == "":
         print(f"Keine IBAN: {iban}.")
         return
-    if len(iban) <= 22:
+    if len(iban) < 22:
         print(f"Hinweis: kurze IBAN: {iban}.")
     conn = connect()
     cursor = conn.cursor()
@@ -91,7 +94,7 @@ def update_iban_leistungserbringer(name:str, iban:str):
         conn.commit()
         conn.close()
 
-def create_rechnung(person_vorname:str, person_nachname:str, leistungsbringer:str, betrag:float, verwendungszweck:str):
+def create_rechnung(person_vorname:str, person_nachname:str, leistungsbringer:str, rechnungsdatum:str, betrag:float, verwendungszweck:str):
     conn = connect()
     cursor = conn.cursor()
     try:
@@ -107,12 +110,12 @@ def create_rechnung(person_vorname:str, person_nachname:str, leistungsbringer:st
             return
         leistungsbringer_id = l_exists[0]
 
-        tmp = cursor.execute("SELECT * FROM rechnung WHERE person_id=? AND leistungsbringer_id=? AND verwendungszweck=?", (person_id,leistungsbringer_id,verwendungszweck)).fetchone()
+        tmp = cursor.execute("SELECT * FROM rechnung WHERE person_id=? AND leistungsbringer_id=? AND rechnungsdatum=?", (person_id,leistungsbringer_id,rechnungsdatum)).fetchone()
         if tmp == None:
-            cursor.execute("INSERT INTO rechnung (person_id,leistungsbringer_id,betrag,verwendungszweck) VALUES (?,?,?,?)",(person_id,leistungsbringer_id,betrag,verwendungszweck))
-            print(f"Rechnung eingefügt: {person_vorname} {person_nachname} → {leistungsbringer}: {betrag}, {verwendungszweck}.")
+            cursor.execute("INSERT INTO rechnung (person_id,leistungsbringer_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?)",(person_id,leistungsbringer_id,rechnungsdatum,betrag,verwendungszweck))
+            print(f"Rechnung eingefügt: {person_vorname} {person_nachname} → {leistungsbringer}: {betrag}, {verwendungszweck} vom {rechnungsdatum}.")
             return
-        print(f"Rechnung existiert bereits: {person_vorname} {person_nachname} → {leistungsbringer}: {verwendungszweck}.")
+        print(f"Rechnung existiert bereits: {person_vorname} {person_nachname} → {leistungsbringer}: {verwendungszweck} vom {rechnungsdatum}.")
     except sqlite3.Error as e:
         print(f"Datenbankfehler: {e}")
         conn.rollback()
@@ -160,3 +163,11 @@ def update_datum_rechnungen(person_vorname:str, person_nachname:str, datum:str):
     finally:
         conn.commit()
         conn.close()
+
+
+if __name__ == '__main__':
+    #create_tabellen()
+    #create_person("Max","Mustermann",0.7)
+    #create_leistungserbringer("Test","DE12123456789012345678")
+    #create_rechnung("Max","Mustermann","Test","01.01.2026",10.21,"12345")
+    print(read_person("Max","Mustermann"))
