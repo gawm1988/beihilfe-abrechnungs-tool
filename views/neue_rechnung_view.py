@@ -2,27 +2,44 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from ttkbootstrap.widgets import DateEntry
 
-from datenbank.sql_queries import neue_rechnung_erfassen
+from datenbank.sqlite_database import create_rechnung, read_all_personen, read_all_leistungsbringer
 
 def setup(master):
     frame = ttk.Frame(master, padding=20)
 
     frame.columnconfigure(1, weight=1)
 
-    # Vorname
-    ttk.Label(frame, text='Vorname').grid(row=0, column=0, sticky=W, padx=5, pady=8)
-    entry_vorname = ttk.Entry(frame)
-    entry_vorname.grid(row=0, column=1, sticky=EW, padx=5, pady=8)
+    personen = read_all_personen()
+    personen_dict = {
+        f"{vorname} {nachname}": pid
+        for pid, vorname, nachname in personen
+    }
 
-    # Nachname
-    ttk.Label(frame, text='Nachname').grid(row=1, column=0, sticky=W, padx=5, pady=8)
-    entry_nachname = ttk.Entry(frame)
-    entry_nachname.grid(row=1, column=1, sticky=EW, padx=5, pady=8)
+    ttk.Label(frame, text="Person").grid(row=0, column=0, sticky=W, padx=5, pady=8)
 
-    # Leistungsbringer
-    ttk.Label(frame, text='Rechnungssteller').grid(row=2, column=0, sticky=W, padx=5, pady=8)
-    entry_leistungsbringer = ttk.Entry(frame)
-    entry_leistungsbringer.grid(row=2, column=1, sticky=EW, padx=5, pady=8)
+    combo_person = ttk.Combobox(
+        frame,
+        values=list(personen_dict.keys()),
+        state="readonly",
+        bootstyle="primary"
+    )
+    combo_person.grid(row=0, column=1, sticky=EW, padx=5, pady=8)
+
+    leistungsbringer = read_all_leistungsbringer()
+    leistungsbringer_dict = {
+        f"{name}": lid
+        for lid, name in leistungsbringer
+    }
+
+    ttk.Label(frame, text="Rechnungssteller").grid(row=1, column=0, sticky=W, padx=5, pady=8)
+
+    combo_leistungsbringer = ttk.Combobox(
+        frame,
+        values=list(leistungsbringer_dict.keys()),
+        state="readonly",
+        bootstyle="primary"
+    )
+    combo_leistungsbringer.grid(row=1, column=1, sticky=EW, padx=5, pady=8)
 
     # Datum
     ttk.Label(frame, text='Rechnungsdatum').grid(row=3, column=0, sticky=W, padx=5, pady=8)
@@ -40,10 +57,23 @@ def setup(master):
     entry_vwz.grid(row=5, column=1, sticky=EW, padx=5, pady=8)
 
     def klick_rechnung_eingabe():
-        neue_rechnung_erfassen(
-            entry_vorname.get(),
-            entry_nachname.get(),
-            entry_leistungsbringer.get(),
+        person = combo_person.get()
+        if not person:
+            print("Keine Person ausgewählt")
+            return
+        person_id = personen_dict[person]
+
+        leistungsbringer = combo_leistungsbringer.get()
+        if not leistungsbringer:
+            print("Kein Rechnungssteller ausgewählt")
+            return
+        leistungsbringer_id = leistungsbringer_dict[leistungsbringer]
+
+
+
+        create_rechnung(
+            person_id,
+            leistungsbringer_id,
             entry_datum.entry.get(),
             entry_betrag.get(),
             entry_vwz.get())

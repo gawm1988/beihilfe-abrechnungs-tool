@@ -42,6 +42,16 @@ def read_person(vorname:str, nachname:str):
     conn.close()
     return tmp
 
+def read_all_personen():
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, vorname, nachname FROM person")
+    personen = cursor.fetchall()
+
+    conn.close()
+    return personen
+
 def create_leistungserbringer(name:str, iban:str):
     if name == "" or name == None:
         print(f"Unvollständige Angaben: {name}.")
@@ -69,6 +79,16 @@ def read_leistungsringer(name:str):
     conn.close()
     return tmp
 
+def read_all_leistungsbringer():
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, name FROM leistungsbringer")
+    leistungsbringer = cursor.fetchall()
+
+    conn.close()
+    return leistungsbringer
+
 def update_iban_leistungserbringer(name:str, iban:str):
     if name == "" or name == None:
         print(f"Unvollständige Angaben: {name}.")
@@ -94,28 +114,21 @@ def update_iban_leistungserbringer(name:str, iban:str):
         conn.commit()
         conn.close()
 
-def create_rechnung(person_vorname:str, person_nachname:str, leistungsbringer:str, rechnungsdatum:str, betrag:float, verwendungszweck:str):
+def create_rechnung(person_id:int, leistungsbringer_id:int, rechnungsdatum:str, betrag:float, verwendungszweck:str):
+    try:
+        betrag = betrag.replace(",", ".")
+    except ValueError:
+        print("Ungültiger Betrag")
+        return
     conn = connect()
     cursor = conn.cursor()
     try:
-        p_exists = read_person(person_vorname,person_nachname)
-        if p_exists is None:
-            print(f"Person nicht vorhanden: {person_vorname} {person_nachname}.")
-            return
-        person_id = p_exists[0]
-
-        l_exists = read_leistungsringer(leistungsbringer)
-        if l_exists is None:
-            print(f"Leistungsbringer nicht vorhanden: {leistungsbringer}.")
-            return
-        leistungsbringer_id = l_exists[0]
-
-        tmp = cursor.execute("SELECT * FROM rechnung WHERE person_id=? AND leistungsbringer_id=? AND rechnungsdatum=?", (person_id,leistungsbringer_id,rechnungsdatum)).fetchone()
+        tmp = cursor.execute("SELECT * FROM rechnung WHERE person_id=? AND leistungsbringer_id=? AND rechnungsdatum=? AND verwendungszweck=?", (person_id,leistungsbringer_id,rechnungsdatum,verwendungszweck)).fetchone()
         if tmp == None:
             cursor.execute("INSERT INTO rechnung (person_id,leistungsbringer_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?)",(person_id,leistungsbringer_id,rechnungsdatum,betrag,verwendungszweck))
-            print(f"Rechnung eingefügt: {person_vorname} {person_nachname} → {leistungsbringer}: {betrag}, {verwendungszweck} vom {rechnungsdatum}.")
+            print(f"Rechnung eingefügt: {person_id} → {leistungsbringer_id}: {betrag}, {verwendungszweck} vom {rechnungsdatum}.")
             return
-        print(f"Rechnung existiert bereits: {person_vorname} {person_nachname} → {leistungsbringer}: {verwendungszweck} vom {rechnungsdatum}.")
+        print(f"Rechnung existiert bereits: {person_id} → {leistungsbringer_id}: {verwendungszweck} vom {rechnungsdatum}.")
     except sqlite3.Error as e:
         print(f"Datenbankfehler: {e}")
         conn.rollback()
