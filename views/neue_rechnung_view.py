@@ -1,8 +1,18 @@
+import re
+import tkinter
+from tkinter import messagebox, PhotoImage
+
 import ttkbootstrap as ttk
+from PIL import Image, ImageTk
 from ttkbootstrap.constants import *
 from ttkbootstrap.widgets import DateEntry
 
 from datenbank.sqlite_database import create_rechnung, read_all_personen, read_all_leistungsbringer
+
+
+def ist_gueltiger_betrag(betrag_str: str) -> bool:
+    pattern = r"^\d+([.,]\d{1,2})?$"
+    return re.fullmatch(pattern, betrag_str) is not None
 
 def setup(master):
     frame = ttk.Frame(master, padding=20)
@@ -69,17 +79,45 @@ def setup(master):
             return
         leistungsbringer_id = leistungsbringer_dict[leistungsbringer]
 
+        betrag = entry_betrag.get()
 
+        if not ist_gueltiger_betrag(betrag):
+            messagebox.showerror("Fehler", "Betrag muss Format 123,45 oder 123.45 haben.")
+            return
 
-        create_rechnung(
+        vwz = entry_vwz.get()
+        datum = entry_datum.entry.get()
+
+        ist_eingefuegt = create_rechnung(
             person_id,
             leistungsbringer_id,
-            entry_datum.entry.get(),
-            entry_betrag.get(),
-            entry_vwz.get())
+            datum,
+            betrag,
+            vwz)
+        if ist_eingefuegt:
+            title = f"{person} -> {leistungsbringer}: € {betrag}, Vwz: {vwz} vom {datum}."
+            messagebox.showinfo(title, "Rechnung erfolgreich eingefügt.")
+            title_var.set(title)
+
+            image = Image.open("../qr_codes/qr_code.png").resize((200, 200))
+            img = ImageTk.PhotoImage(image)
+            qr_code_label.configure(image=img)
+            qr_code_label.image = img
+
+        else:
+            messagebox.showinfo("Info", "Rechnung nicht eingefügt.")
 
     ttk.Button(frame, text='Eingabe', bootstyle="success", command=klick_rechnung_eingabe)\
         .grid(row=6, column=0, columnspan=2, sticky=EW, pady=20)
+
+    title_var = ttk.StringVar()
+    qr_code_label = ttk.Label(frame, textvariable=title_var)
+    qr_code_label.grid(row=7, column=0, columnspan=2, pady=10)
+
+    qr_code_label = ttk.Label(frame)
+    qr_code_label.grid(row=8, column=0, columnspan=2, pady=10)
+
+
 
     return frame
 

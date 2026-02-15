@@ -1,7 +1,7 @@
 import requests
 
 def create_epc_qrcode(empfaenger:str, iban:str, betrag:float, vwz:str):
-    """"
+    """
     Funktion zum Erstellen eines Überweisungscodes. Speicherung als PNG.
     Siehe: https://qrcode.tec-it.com/de/SEPA
     """
@@ -13,3 +13,6 @@ def create_epc_qrcode(empfaenger:str, iban:str, betrag:float, vwz:str):
         print("QR-Code gespeichert als qr_code.png")
     else:
         print("Fehler beim Abrufen:", response.status_code)
+
+if __name__ == '__main__':
+    create_epc_qrcode("Test","DE1235512423423",100,"123124ksdfe")

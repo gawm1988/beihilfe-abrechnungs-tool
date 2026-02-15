@@ -114,7 +114,7 @@ def update_iban_leistungserbringer(name:str, iban:str):
         conn.commit()
         conn.close()
 
-def create_rechnung(person_id:int, leistungsbringer_id:int, rechnungsdatum:str, betrag:float, verwendungszweck:str):
+def create_rechnung(person_id:int, leistungsbringer_id:int, rechnungsdatum:str, betrag:str, verwendungszweck:str)->bool:
     try:
         betrag = betrag.replace(",", ".")
     except ValueError:
@@ -127,7 +127,7 @@ def create_rechnung(person_id:int, leistungsbringer_id:int, rechnungsdatum:str, 
         if tmp == None:
             cursor.execute("INSERT INTO rechnung (person_id,leistungsbringer_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?)",(person_id,leistungsbringer_id,rechnungsdatum,betrag,verwendungszweck))
             print(f"Rechnung eingefügt: {person_id} → {leistungsbringer_id}: {betrag}, {verwendungszweck} vom {rechnungsdatum}.")
-            return
+            return True
         print(f"Rechnung existiert bereits: {person_id} → {leistungsbringer_id}: {verwendungszweck} vom {rechnungsdatum}.")
     except sqlite3.Error as e:
         print(f"Datenbankfehler: {e}")
@@ -135,6 +135,8 @@ def create_rechnung(person_id:int, leistungsbringer_id:int, rechnungsdatum:str, 
     finally:
         conn.commit()
         conn.close()
+    return False
+
 
 def read_offene_rechnungen(person_vorname:str, person_nachname:str):
     conn = connect()
@@ -179,8 +181,8 @@ def update_datum_rechnungen(person_vorname:str, person_nachname:str, datum:str):
 
 
 if __name__ == '__main__':
-    #create_tabellen()
-    #create_person("Max","Mustermann",0.7)
-    #create_leistungserbringer("Test","DE12123456789012345678")
+    create_tabellen()
+    create_person("Max","Mustermann",0.7)
+    create_leistungserbringer("Test","DE12123456789012345678")
     #create_rechnung("Max","Mustermann","Test","01.01.2026",10.21,"12345")
     print(read_person("Max","Mustermann"))
