@@ -11,8 +11,8 @@ def create_tabellen():
     conn = connect()
     cursor = conn.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS person (id INTEGER PRIMARY KEY, vorname TEXT NOT NULL, nachname TEXT NOT NULL, beihilfesatz REAL)")
-    cursor.execute("CREATE TABLE IF NOT EXISTS leistungsbringer (id INTEGER PRIMARY KEY, name TEXT NOT NULL, iban TEXT)")
-    cursor.execute("CREATE TABLE IF NOT EXISTS rechnung (id INTEGER PRIMARY KEY, person_id INTEGER NOT NULL, leistungsbringer_id INTEGER NOT NULL, rechnungsdatum DATE NOT NULL, betrag REAL NOT NULL, verwendungszweck TEXT NOT NULL, abrechnungsdatum DATE)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS rechnungssteller (id INTEGER PRIMARY KEY, name TEXT NOT NULL, iban TEXT)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS rechnung (id INTEGER PRIMARY KEY, person_id INTEGER NOT NULL, rechnungssteller_id INTEGER NOT NULL, rechnungsdatum DATE NOT NULL, betrag REAL NOT NULL, verwendungszweck TEXT NOT NULL, abrechnungsdatum DATE)")
     conn.commit()
     conn.close()
 
@@ -52,7 +52,7 @@ def read_all_personen():
     conn.close()
     return personen
 
-def create_leistungserbringer(name:str, iban:str):
+def create_rechnungssteller(name:str, iban:str):
     if name == "" or name == None:
         print(f"Unvollständige Angaben: {name}.")
         return
@@ -62,34 +62,34 @@ def create_leistungserbringer(name:str, iban:str):
         print(f"Hinweis: kurze IBAN: {iban}.")
     conn = connect()
     cursor = conn.cursor()
-    tmp = cursor.execute("SELECT * FROM leistungsbringer WHERE name=?", (name,)).fetchone()
+    tmp = cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
     if tmp is None:
-        cursor.execute("INSERT INTO leistungsbringer (name,iban) VALUES (?,?)", (name, iban))
-        print(f"Leistungsbringer: {name} eingefügt.")
+        cursor.execute("INSERT INTO rechnungssteller (name,iban) VALUES (?,?)", (name, iban))
+        print(f"rechnungssteller: {name} eingefügt.")
     else:
-        print(f"Leistungsbringer: {name} existiert bereits.")
+        print(f"rechnungssteller: {name} existiert bereits.")
     conn.commit()
     conn.close()
 
 def read_leistungsringer(name:str):
     conn = connect()
     cursor = conn.cursor()
-    tmp = cursor.execute("SELECT * FROM leistungsbringer WHERE name=?", (name,)).fetchone()
+    tmp = cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
     conn.commit()
     conn.close()
     return tmp
 
-def read_all_leistungsbringer():
+def read_all_rechnungssteller():
     conn = connect()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, name FROM leistungsbringer")
-    leistungsbringer = cursor.fetchall()
+    cursor.execute("SELECT id, name FROM rechnungssteller")
+    rechnungssteller = cursor.fetchall()
 
     conn.close()
-    return leistungsbringer
+    return rechnungssteller
 
-def update_iban_leistungserbringer(name:str, iban:str):
+def update_iban_rechnungssteller(name:str, iban:str):
     if name == "" or name == None:
         print(f"Unvollständige Angaben: {name}.")
         return
@@ -103,9 +103,9 @@ def update_iban_leistungserbringer(name:str, iban:str):
     try:
         l_exists = read_leistungsringer(name)
         if l_exists is None:
-            print(f"Leistungsbringer nicht vorhanden: {name}.")
+            print(f"rechnungssteller nicht vorhanden: {name}.")
             return
-        cursor.execute("UPDATE leistungsbringer SET iban = ? WHERE name = ?", (iban, name))
+        cursor.execute("UPDATE rechnungssteller SET iban = ? WHERE name = ?", (iban, name))
         print(f"IBAN aktualisiert: {name} → IBAN: {iban}.")
     except sqlite3.Error as e:
         print(f"Datenbankfehler: {e}")
@@ -114,7 +114,7 @@ def update_iban_leistungserbringer(name:str, iban:str):
         conn.commit()
         conn.close()
 
-def create_rechnung(person_id:int, leistungsbringer_id:int, rechnungsdatum:str, betrag:str, verwendungszweck:str)->bool:
+def create_rechnung(person_id:int, rechnungssteller_id:int, rechnungsdatum:str, betrag:str, verwendungszweck:str)->bool:
     try:
         betrag = betrag.replace(",", ".")
     except ValueError:
@@ -123,12 +123,12 @@ def create_rechnung(person_id:int, leistungsbringer_id:int, rechnungsdatum:str, 
     conn = connect()
     cursor = conn.cursor()
     try:
-        tmp = cursor.execute("SELECT * FROM rechnung WHERE person_id=? AND leistungsbringer_id=? AND rechnungsdatum=? AND verwendungszweck=?", (person_id,leistungsbringer_id,rechnungsdatum,verwendungszweck)).fetchone()
+        tmp = cursor.execute("SELECT * FROM rechnung WHERE person_id=? AND rechnungssteller_id=? AND rechnungsdatum=? AND verwendungszweck=?", (person_id,rechnungssteller_id,rechnungsdatum,verwendungszweck)).fetchone()
         if tmp == None:
-            cursor.execute("INSERT INTO rechnung (person_id,leistungsbringer_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?)",(person_id,leistungsbringer_id,rechnungsdatum,betrag,verwendungszweck))
-            print(f"Rechnung eingefügt: {person_id} → {leistungsbringer_id}: {betrag}, {verwendungszweck} vom {rechnungsdatum}.")
+            cursor.execute("INSERT INTO rechnung (person_id,rechnungssteller_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?)",(person_id,rechnungssteller_id,rechnungsdatum,betrag,verwendungszweck))
+            print(f"Rechnung eingefügt: {person_id} → {rechnungssteller_id}: {betrag}, {verwendungszweck} vom {rechnungsdatum}.")
             return True
-        print(f"Rechnung existiert bereits: {person_id} → {leistungsbringer_id}: {verwendungszweck} vom {rechnungsdatum}.")
+        print(f"Rechnung existiert bereits: {person_id} → {rechnungssteller_id}: {verwendungszweck} vom {rechnungsdatum}.")
     except sqlite3.Error as e:
         print(f"Datenbankfehler: {e}")
         conn.rollback()
@@ -183,6 +183,6 @@ def update_datum_rechnungen(person_vorname:str, person_nachname:str, datum:str):
 if __name__ == '__main__':
     create_tabellen()
     create_person("Max","Mustermann",0.7)
-    create_leistungserbringer("Test","DE12123456789012345678")
+    create_rechnungssteller("Test","DE12123456789012345678")
     #create_rechnung("Max","Mustermann","Test","01.01.2026",10.21,"12345")
     print(read_person("Max","Mustermann"))

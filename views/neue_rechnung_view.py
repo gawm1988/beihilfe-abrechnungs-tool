@@ -1,20 +1,21 @@
 import re
-import tkinter
-from tkinter import messagebox, PhotoImage
-
+import os
+from tkinter import messagebox
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
 from ttkbootstrap.constants import *
 from ttkbootstrap.widgets import DateEntry
 
-from datenbank.sqlite_database import create_rechnung, read_all_personen, read_all_leistungsbringer
+from datenbank.sqlite_database import create_rechnung, read_all_personen, read_all_rechnungssteller
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+QR_PATH = os.path.join(BASE_DIR, "qr_codes", "qr_code.png")
 
 def ist_gueltiger_betrag(betrag_str: str) -> bool:
     pattern = r"^\d+([.,]\d{1,2})?$"
     return re.fullmatch(pattern, betrag_str) is not None
 
-def setup(master):
+def setup(master)->ttk.Frame:
     frame = ttk.Frame(master, padding=20)
 
     frame.columnconfigure(1, weight=1)
@@ -35,21 +36,21 @@ def setup(master):
     )
     combo_person.grid(row=0, column=1, sticky=EW, padx=5, pady=8)
 
-    leistungsbringer = read_all_leistungsbringer()
-    leistungsbringer_dict = {
+    rechnungssteller = read_all_rechnungssteller()
+    rechnungssteller_dict = {
         f"{name}": lid
-        for lid, name in leistungsbringer
+        for lid, name in rechnungssteller
     }
 
     ttk.Label(frame, text="Rechnungssteller").grid(row=1, column=0, sticky=W, padx=5, pady=8)
 
-    combo_leistungsbringer = ttk.Combobox(
+    combo_rechnungssteller = ttk.Combobox(
         frame,
-        values=list(leistungsbringer_dict.keys()),
+        values=list(rechnungssteller_dict.keys()),
         state="readonly",
         bootstyle="primary"
     )
-    combo_leistungsbringer.grid(row=1, column=1, sticky=EW, padx=5, pady=8)
+    combo_rechnungssteller.grid(row=1, column=1, sticky=EW, padx=5, pady=8)
 
     # Datum
     ttk.Label(frame, text='Rechnungsdatum').grid(row=3, column=0, sticky=W, padx=5, pady=8)
@@ -73,11 +74,11 @@ def setup(master):
             return
         person_id = personen_dict[person]
 
-        leistungsbringer = combo_leistungsbringer.get()
-        if not leistungsbringer:
+        rechnungssteller = combo_rechnungssteller.get()
+        if not rechnungssteller:
             print("Kein Rechnungssteller ausgewählt")
             return
-        leistungsbringer_id = leistungsbringer_dict[leistungsbringer]
+        rechnungssteller_id = rechnungssteller_dict[rechnungssteller]
 
         betrag = entry_betrag.get()
 
@@ -90,25 +91,27 @@ def setup(master):
 
         ist_eingefuegt = create_rechnung(
             person_id,
-            leistungsbringer_id,
+            rechnungssteller_id,
             datum,
             betrag,
             vwz)
         if ist_eingefuegt:
-            title = f"{person} -> {leistungsbringer}: € {betrag}, Vwz: {vwz} vom {datum}."
+            title = f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {vwz} vom {datum}."
             messagebox.showinfo(title, "Rechnung erfolgreich eingefügt.")
             title_var.set(title)
 
-            image = Image.open("../qr_codes/qr_code.png").resize((200, 200))
+            image = Image.open(QR_PATH).resize((200, 200))
             img = ImageTk.PhotoImage(image)
             qr_code_label.configure(image=img)
             qr_code_label.image = img
 
+            eingabe_button.configure(state="disabled")
+
         else:
             messagebox.showinfo("Info", "Rechnung nicht eingefügt.")
 
-    ttk.Button(frame, text='Eingabe', bootstyle="success", command=klick_rechnung_eingabe)\
-        .grid(row=6, column=0, columnspan=2, sticky=EW, pady=20)
+    eingabe_button = ttk.Button(frame, text='Eingabe', bootstyle="success", command=klick_rechnung_eingabe)
+    eingabe_button.grid(row=6, column=0, columnspan=2, sticky=EW, pady=20)
 
     title_var = ttk.StringVar()
     qr_code_label = ttk.Label(frame, textvariable=title_var)
