@@ -1,4 +1,3 @@
-import re
 import os
 from tkinter import messagebox
 import ttkbootstrap as ttk
@@ -6,14 +5,12 @@ from PIL import Image, ImageTk
 from ttkbootstrap.constants import *
 from ttkbootstrap.widgets import DateEntry
 
-from datenbank.sqlite_database import create_rechnung, read_all_personen, read_all_rechnungssteller
+from datenbank.person import read_all_personen
+from datenbank.rechnungssteller import read_all_rechnungssteller
+from services.rechnung_services import neue_rechnung_erfassen, ist_gueltiger_betrag
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 QR_PATH = os.path.join(BASE_DIR, "qr_codes", "qr_code.png")
-
-def ist_gueltiger_betrag(betrag_str: str) -> bool:
-    pattern = r"^\d+([.,]\d{1,2})?$"
-    return re.fullmatch(pattern, betrag_str) is not None
 
 def setup(master)->ttk.Frame:
     frame = ttk.Frame(master, padding=20)
@@ -89,15 +86,15 @@ def setup(master)->ttk.Frame:
         vwz = entry_vwz.get()
         datum = entry_datum.entry.get()
 
-        ist_eingefuegt = create_rechnung(
+        ist_eingefuegt = neue_rechnung_erfassen(
             person_id,
             rechnungssteller_id,
             datum,
             betrag,
             vwz)
         if ist_eingefuegt:
-            title = f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {vwz} vom {datum}."
-            messagebox.showinfo(title, "Rechnung erfolgreich eingefügt.")
+            title = "✅ Rechnung erfolgreich eingefügt."
+            messagebox.showinfo(title, f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {vwz} vom {datum}.")
             title_var.set(title)
 
             image = Image.open(QR_PATH).resize((200, 200))
@@ -108,7 +105,7 @@ def setup(master)->ttk.Frame:
             eingabe_button.configure(state="disabled")
 
         else:
-            messagebox.showinfo("Info", "Rechnung nicht eingefügt.")
+            messagebox.showinfo("❌ Rechnung nicht eingefügt.", f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {vwz} vom {datum}.")
 
     eingabe_button = ttk.Button(frame, text='Eingabe', bootstyle="success", command=klick_rechnung_eingabe)
     eingabe_button.grid(row=6, column=0, columnspan=2, sticky=EW, pady=20)
