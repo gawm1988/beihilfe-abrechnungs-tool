@@ -1,6 +1,5 @@
 from .connection import connect
 from .person import read_person
-from .rechnungssteller import read_rechnungssteller
 
 def create_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str) -> bool:
     with connect() as conn:
@@ -9,7 +8,6 @@ def create_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: st
             "INSERT INTO rechnung (person_id,rechnungssteller_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?)",
             (person_id, rechnungssteller_id, rechnungsdatum, betrag, verwendungszweck)
         )
-        print(f"Rechnung eingefügt: {person_id} → {rechnungssteller_id}: {betrag} €, {verwendungszweck} vom {rechnungsdatum}.")
 
 def read_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str):
     with connect() as conn:

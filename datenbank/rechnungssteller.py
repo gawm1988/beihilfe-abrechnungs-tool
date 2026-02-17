@@ -1,5 +1,16 @@
 from .connection import connect
 
+class RechnungstellerDTO:
+    id: int
+    name: str
+    iban: str
+
+    def __init__(self,id:int, name:str, iban:str):
+        self.id = id
+        self.name = name
+        self.iban = iban
+
+
 def create_rechnungssteller(name: str, iban: str = "leer"):
     if not name:
         print(f"Unvollständige Angaben: {name}.")
@@ -19,7 +30,14 @@ def create_rechnungssteller(name: str, iban: str = "leer"):
 def read_rechnungssteller(name: str):
     with connect() as conn:
         cursor = conn.cursor()
-        return cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
+        fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
+        return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
+
+def read_rechnungssteller_by_id(rechnungsteller_id: int)->RechnungstellerDTO:
+    with connect() as conn:
+        cursor = conn.cursor()
+        fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE id=?", (rechnungsteller_id,)).fetchone()
+        return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
 def read_all_rechnungssteller():
     with connect() as conn:

@@ -7,7 +7,7 @@ from ttkbootstrap.widgets import DateEntry
 
 from datenbank.person import read_all_personen
 from datenbank.rechnungssteller import read_all_rechnungssteller
-from services.rechnung_services import neue_rechnung_erfassen, ist_gueltiger_betrag
+from services.rechnung_services import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 QR_PATH = os.path.join(BASE_DIR, "qr_codes", "qr_code.png")
@@ -97,7 +97,8 @@ def setup(master)->ttk.Frame:
             messagebox.showinfo(title, f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {vwz} vom {datum}.")
             title_var.set(title)
 
-            image = Image.open(QR_PATH).resize((200, 200))
+            #image = Image.open(QR_PATH).resize((200, 200))
+            image = erzeuge_epc_qr_code(rechnungssteller_id, betrag, vwz)
             img = ImageTk.PhotoImage(image)
             qr_code_label.configure(image=img)
             qr_code_label.image = img
