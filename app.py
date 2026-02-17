@@ -1,6 +1,7 @@
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import views.neue_rechnung_view
+import views.rechnungssteller_anlegen_view
 
 class App(ttk.Window):
     FONT = ("Segoe UI", 18)
@@ -82,7 +83,9 @@ class App(ttk.Window):
 
     def show_rechnungssteller(self):
         self.clear_content()
-        ttk.Label(self.content, text="Rechnungsstellerverwaltung", font=self.FONT).pack()
+        ttk.Label(self.content, text="Neuen Rechnungssteller erfassen", font=self.FONT).pack()
+        frame = views.rechnungssteller_anlegen_view.setup(self.content)
+        frame.pack(fill=X)
 
 
 if __name__ == "__main__":

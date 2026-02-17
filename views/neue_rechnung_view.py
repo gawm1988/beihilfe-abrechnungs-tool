@@ -9,8 +9,6 @@ from datenbank.person import read_all_personen
 from datenbank.rechnungssteller import read_all_rechnungssteller
 from services.rechnung_services import *
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-QR_PATH = os.path.join(BASE_DIR, "qr_codes", "qr_code.png")
 
 def setup(master)->ttk.Frame:
     frame = ttk.Frame(master, padding=20)
@@ -61,8 +59,8 @@ def setup(master)->ttk.Frame:
 
     # Verwendungszweck
     ttk.Label(frame, text='Verwendungszweck').grid(row=5, column=0, sticky=W, padx=5, pady=8)
-    entry_vwz = ttk.Entry(frame)
-    entry_vwz.grid(row=5, column=1, sticky=EW, padx=5, pady=8)
+    entry_verwendungszweck = ttk.Entry(frame)
+    entry_verwendungszweck.grid(row=5, column=1, sticky=EW, padx=5, pady=8)
 
     def klick_rechnung_eingabe():
         person = combo_person.get()
@@ -83,7 +81,7 @@ def setup(master)->ttk.Frame:
             messagebox.showerror("Fehler", "Betrag muss Format 123,45 oder 123.45 haben.")
             return
 
-        vwz = entry_vwz.get()
+        verwendungszweck = entry_verwendungszweck.get()
         datum = entry_datum.entry.get()
 
         ist_eingefuegt = neue_rechnung_erfassen(
@@ -91,14 +89,13 @@ def setup(master)->ttk.Frame:
             rechnungssteller_id,
             datum,
             betrag,
-            vwz)
+            verwendungszweck)
         if ist_eingefuegt:
             title = "✅ Rechnung erfolgreich eingefügt."
-            messagebox.showinfo(title, f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {vwz} vom {datum}.")
+            messagebox.showinfo(title, f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {verwendungszweck} vom {datum}.")
             title_var.set(title)
 
-            #image = Image.open(QR_PATH).resize((200, 200))
-            image = erzeuge_epc_qr_code(rechnungssteller_id, betrag, vwz)
+            image = erzeuge_epc_qr_code(rechnungssteller_id, betrag, verwendungszweck)
             img = ImageTk.PhotoImage(image)
             qr_code_label.configure(image=img)
             qr_code_label.image = img
@@ -106,9 +103,9 @@ def setup(master)->ttk.Frame:
             eingabe_button.configure(state="disabled")
 
         else:
-            messagebox.showinfo("❌ Rechnung nicht eingefügt.", f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {vwz} vom {datum}.")
+            messagebox.showerror("❌ Rechnung nicht eingefügt.", f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {verwendungszweck} vom {datum}.")
 
-    eingabe_button = ttk.Button(frame, text='Eingabe', bootstyle="success", command=klick_rechnung_eingabe)
+    eingabe_button = ttk.Button(frame, text="Eingabe", bootstyle="success", command=klick_rechnung_eingabe)
     eingabe_button.grid(row=6, column=0, columnspan=2, sticky=EW, pady=20)
 
     title_var = ttk.StringVar()
@@ -117,8 +114,6 @@ def setup(master)->ttk.Frame:
 
     qr_code_label = ttk.Label(frame)
     qr_code_label.grid(row=8, column=0, columnspan=2, pady=10)
-
-
 
     return frame
 

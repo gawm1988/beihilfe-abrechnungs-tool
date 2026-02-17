@@ -27,7 +27,7 @@ def create_rechnungssteller(name: str, iban: str = "leer"):
         else:
             print(f"Rechnungssteller: {name} existiert bereits.")
 
-def read_rechnungssteller(name: str):
+def read_rechnungssteller_by_name(name: str)->RechnungstellerDTO:
     with connect() as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
