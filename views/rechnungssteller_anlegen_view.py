@@ -21,12 +21,12 @@ def setup(master)->ttk.Frame:
     def klick_rechnungssteller_anlegen():
         rechnungsteller_name = entry_rechnungssteller.get()
         rechnungsteller_iban = entry_iban.get()
-        ist_eingefuegt = neuen_rechnungsteller_erfassen(rechnungsteller_name, rechnungsteller_iban)
+        ist_eingefuegt, message = neuen_rechnungsteller_erfassen(rechnungsteller_name, rechnungsteller_iban)
         if ist_eingefuegt:
-            messagebox.showinfo("✅ Erfolgreich eingefügt",f"Rechnungssteller: {rechnungsteller_name}\nIBAN: {rechnungsteller_iban}.")
+            messagebox.showinfo("✅ Erfolgreich eingefügt",message)
             rechnungsteller_anlegen_button.configure(state=DISABLED)
         else:
-            messagebox.showerror("❌ Fehler", f"Rechnungsteller {rechnungsteller_name} existiert bereits.")
+            messagebox.showerror("Fehler", message)
 
 
     rechnungsteller_anlegen_button = ttk.Button(frame,text="Eingabe", bootstyle="success", command=klick_rechnungssteller_anlegen)

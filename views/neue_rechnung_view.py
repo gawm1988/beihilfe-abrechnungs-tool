@@ -6,8 +6,8 @@ from ttkbootstrap.constants import *
 from ttkbootstrap.widgets import DateEntry
 
 from datenbank.person import read_all_personen
-from datenbank.rechnungssteller import read_all_rechnungssteller
 from services.rechnung_services import *
+from services.rechnungssteller_services import lade_alle_rechnungssteller
 
 
 def setup(master)->ttk.Frame:
@@ -31,11 +31,8 @@ def setup(master)->ttk.Frame:
     )
     combo_person.grid(row=0, column=1, sticky=EW, padx=5, pady=8)
 
-    rechnungssteller = read_all_rechnungssteller()
-    rechnungssteller_dict = {
-        f"{name}": lid
-        for lid, name in rechnungssteller
-    }
+    rechnungssteller_dict = lade_alle_rechnungssteller()
+    print(rechnungssteller_dict)
 
     ttk.Label(frame, text="Rechnungssteller").grid(row=1, column=0, sticky=W, padx=5, pady=8)
 
@@ -46,6 +43,19 @@ def setup(master)->ttk.Frame:
         bootstyle="primary"
     )
     combo_rechnungssteller.grid(row=1, column=1, sticky=EW, padx=5, pady=8)
+
+    ttk.Label(frame, text="IBAN").grid(row=2, column=0, sticky=W, padx=5, pady=8)
+
+    iban_var = ttk.StringVar()
+    entry_iban = ttk.Entry(frame, textvariable=iban_var, state="readonly")
+    entry_iban.grid(row=2, column=1, sticky=EW, padx=5, pady=8)
+
+    def on_rechnungssteller_select(event):
+        name = combo_rechnungssteller.get()
+        iban_var.set(rechnungssteller_dict[name])
+
+    combo_rechnungssteller.bind("<<ComboboxSelected>>", on_rechnungssteller_select)
+
 
     # Datum
     ttk.Label(frame, text='Rechnungsdatum').grid(row=3, column=0, sticky=W, padx=5, pady=8)
@@ -73,7 +83,6 @@ def setup(master)->ttk.Frame:
         if not rechnungssteller:
             print("Kein Rechnungssteller ausgewählt")
             return
-        rechnungssteller_id = rechnungssteller_dict[rechnungssteller]
 
         betrag = entry_betrag.get()
 
@@ -86,7 +95,7 @@ def setup(master)->ttk.Frame:
 
         ist_eingefuegt = neue_rechnung_erfassen(
             person_id,
-            rechnungssteller_id,
+            rechnungssteller,
             datum,
             betrag,
             verwendungszweck)
@@ -95,7 +104,7 @@ def setup(master)->ttk.Frame:
             messagebox.showinfo(title, f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {verwendungszweck} vom {datum}.")
             title_var.set(title)
 
-            image = erzeuge_epc_qr_code(rechnungssteller_id, betrag, verwendungszweck)
+            image = erzeuge_epc_qr_code(rechnungssteller, betrag, verwendungszweck)
             img = ImageTk.PhotoImage(image)
             qr_code_label.configure(image=img)
             qr_code_label.image = img

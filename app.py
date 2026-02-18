@@ -2,6 +2,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 import views.neue_rechnung_view
 import views.rechnungssteller_anlegen_view
+import views.rechnungssteller_aktualisieren_view
 
 class App(ttk.Window):
     FONT = ("Segoe UI", 18)
@@ -35,9 +36,15 @@ class App(ttk.Window):
             self.sidebar,
             text="Rechnungssteller",
             bootstyle="light",
-            command=self.show_rechnungssteller
+            command=self.show_rechnungssteller_erfassen
         ).pack(fill=X, pady=5)
 
+        ttk.Button(
+            self.sidebar,
+            text="IBAN",
+            bootstyle="light",
+            command=self.show_rechnungssteller_aktualisieren
+        ).pack(fill=X, pady=5)
 
         ttk.Button(
             self.sidebar,
@@ -81,11 +88,18 @@ class App(ttk.Window):
         self.clear_content()
         ttk.Label(self.content, text="Übersicht", font=self.FONT).pack()
 
-    def show_rechnungssteller(self):
+    def show_rechnungssteller_erfassen(self):
         self.clear_content()
         ttk.Label(self.content, text="Neuen Rechnungssteller erfassen", font=self.FONT).pack()
         frame = views.rechnungssteller_anlegen_view.setup(self.content)
         frame.pack(fill=X)
+
+    def show_rechnungssteller_aktualisieren(self):
+        self.clear_content()
+        ttk.Label(self.content, text="IBAN aktualisieren", font=self.FONT).pack()
+        frame = views.rechnungssteller_aktualisieren_view.setup(self.content)
+        frame.pack(fill=X)
+
 
 
 if __name__ == "__main__":

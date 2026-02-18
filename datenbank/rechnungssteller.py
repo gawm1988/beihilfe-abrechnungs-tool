@@ -11,21 +11,10 @@ class RechnungstellerDTO:
         self.iban = iban
 
 
-def create_rechnungssteller(name: str, iban: str = "leer"):
-    if not name:
-        print(f"Unvollständige Angaben: {name}.")
-        return
-    if len(iban) < 22:
-        print(f"Hinweis: kurze IBAN: {iban}.")
-
+def create_rechnungssteller(name: str, iban: str):
     with connect() as conn:
         cursor = conn.cursor()
-        tmp = cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
-        if tmp is None:
-            cursor.execute("INSERT INTO rechnungssteller (name,iban) VALUES (?,?)", (name, iban))
-            print(f"Rechnungssteller: {name} eingefügt.")
-        else:
-            print(f"Rechnungssteller: {name} existiert bereits.")
+        cursor.execute("INSERT INTO rechnungssteller (name,iban) VALUES (?,?)", (name, iban))
 
 def read_rechnungssteller_by_name(name: str)->RechnungstellerDTO:
     with connect() as conn:
@@ -39,23 +28,12 @@ def read_rechnungssteller_by_id(rechnungsteller_id: int)->RechnungstellerDTO:
         fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE id=?", (rechnungsteller_id,)).fetchone()
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
-def read_all_rechnungssteller():
+def read_alle_rechnungssteller_namen():
     with connect() as conn:
         cursor = conn.cursor()
-        return cursor.execute("SELECT id, name FROM rechnungssteller").fetchall()
+        return cursor.execute("SELECT name, iban FROM rechnungssteller").fetchall()
 
 def update_iban(name: str, iban: str):
-    if not name or not iban:
-        print("Unvollständige Angaben.")
-        return
-    if len(iban) < 22:
-        print(f"Hinweis: kurze IBAN: {iban}.")
-
     with connect() as conn:
         cursor = conn.cursor()
-        l_exists = read_leistungsbringer(name)
-        if l_exists is None:
-            print(f"Rechnungssteller nicht vorhanden: {name}.")
-            return
         cursor.execute("UPDATE rechnungssteller SET iban = ? WHERE name = ?", (iban, name))
-        print(f"IBAN aktualisiert: {name} → {iban}.")
