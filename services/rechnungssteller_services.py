@@ -15,6 +15,7 @@ def ist_valide_iban(iban:str):
 
 
 def neuen_rechnungsteller_erfassen(name:str, iban:str):
+    rechnungstellerDTO = read_rechnungssteller_by_name(name)
     if rechnungstellerDTO:
         return False, "Rechnungssteller existiert bereits."
 
