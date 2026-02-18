@@ -20,12 +20,16 @@ def read_rechnungssteller_by_name(name: str)->RechnungstellerDTO:
     with connect() as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
+        if fetch is None:
+            return None
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
 def read_rechnungssteller_by_id(rechnungsteller_id: int)->RechnungstellerDTO:
     with connect() as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE id=?", (rechnungsteller_id,)).fetchone()
+        if fetch is None:
+            return None
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
 def read_alle_rechnungssteller_namen():

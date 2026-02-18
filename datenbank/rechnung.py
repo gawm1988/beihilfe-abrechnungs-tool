@@ -31,6 +31,8 @@ def read_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str,
     with connect() as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM rechnung WHERE person_id=? AND rechnungssteller_id=? AND rechnungsdatum=? AND betrag=? AND verwendungszweck=?", (person_id,rechnungssteller_id,rechnungsdatum,betrag,verwendungszweck)).fetchone()
+        if fetch is None:
+            return None
         return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5])
 
 def read_offene_rechnungen(person_vorname: str, person_nachname: str):

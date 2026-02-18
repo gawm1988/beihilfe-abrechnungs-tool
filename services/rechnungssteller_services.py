@@ -9,49 +9,39 @@ def ist_valide_iban(iban:str):
         return True
     try:
         iban = IBAN(iban)
-        print("IBAN ist gültig")
         return True
     except ValueError:
-        print("IBAN ist ungültig")
         return False
 
 
 def neuen_rechnungsteller_erfassen(name:str, iban:str):
-    try:
-        rechnungstellerDTO = read_rechnungssteller_by_name(name)
-        if rechnungstellerDTO:
-            return False, "Rechnungsteller existiert bereits."
-    except TypeError as e:
-        print(e)
-    if ist_valide_iban(iban):
-        create_rechnungssteller(name, iban)
-        return True, f"Rechnungsteller {name} angelegt.\nIBAN: {iban}"
-    else:
+    if rechnungstellerDTO:
+        return False, "Rechnungssteller existiert bereits."
+
+    if not ist_valide_iban(iban):
         return False, f"IBAN {iban} ist ungültig."
 
+    create_rechnungssteller(name, iban)
+    return True, f"Rechnungssteller {name} angelegt.\nIBAN: {iban}"
+
 def lade_alle_rechnungssteller()->dict[str, int]:
-    try:
-        rechnungssteller = read_alle_rechnungssteller_namen()
-        rechnungssteller_dict = {
-            f"{name}": iban
-            for name, iban in rechnungssteller
-        }
-        return collections.OrderedDict(sorted(rechnungssteller_dict.items()))
-    except TypeError as e:
-        print(e)
-        return None
+    rechnungssteller = read_alle_rechnungssteller_namen()
+    rechnungssteller_dict = {
+        f"{name}": iban
+        for name, iban in rechnungssteller
+    }
+    return collections.OrderedDict(sorted(rechnungssteller_dict.items()))
 
 def iban_aktualisieren(name:str, iban:str):
     if not ist_valide_iban(iban):
         return False, f"IBAN {iban} ist ungültig."
-    try:
-        read_rechnungssteller_by_name(name)
-        update_iban(name, iban)
-        return True, f"Rechnungsteller {name} aktualisiert.\nIBAN: {iban}"
-    except TypeError as e:
-        print(e)
-        return False, f"Rechnungsteller existiert nicht."
 
+    rechnungstellerDTO = read_rechnungssteller_by_name(name)
+    if not rechnungstellerDTO:
+        return False, f"Rechnungssteller {name} existiert nicht."
+
+    update_iban(name, iban)
+    return True, f"Rechnungssteller {name} aktualisiert.\nIBAN: {iban}"
 
 if __name__ == '__main__':
     #print(ist_valide_iban("GB33BUKB20201555555555"))

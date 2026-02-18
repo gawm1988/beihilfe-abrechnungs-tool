@@ -22,6 +22,8 @@ def read_person_by_name(vorname: str, nachname: str):
     with connect() as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM person WHERE vorname=? AND nachname=?",(vorname, nachname)).fetchone()
+        if fetch is None:
+            return None
         return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])
 
 def read_all_personen():

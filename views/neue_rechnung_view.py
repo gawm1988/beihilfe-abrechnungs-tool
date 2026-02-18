@@ -32,7 +32,6 @@ def setup(master)->ttk.Frame:
     combo_person.grid(row=0, column=1, sticky=EW, padx=5, pady=8)
 
     rechnungssteller_dict = lade_alle_rechnungssteller()
-    print(rechnungssteller_dict)
 
     ttk.Label(frame, text="Rechnungssteller").grid(row=1, column=0, sticky=W, padx=5, pady=8)
 
@@ -56,18 +55,14 @@ def setup(master)->ttk.Frame:
 
     combo_rechnungssteller.bind("<<ComboboxSelected>>", on_rechnungssteller_select)
 
-
-    # Datum
     ttk.Label(frame, text='Rechnungsdatum').grid(row=3, column=0, sticky=W, padx=5, pady=8)
     entry_datum = DateEntry(frame, bootstyle="primary", dateformat="%d.%m.%Y")
     entry_datum.grid(row=3, column=1, sticky=EW, padx=5, pady=8)
 
-    # Betrag
     ttk.Label(frame, text='Betrag in €').grid(row=4, column=0, sticky=W, padx=5, pady=8)
     entry_betrag = ttk.Entry(frame)
     entry_betrag.grid(row=4, column=1, sticky=EW, padx=5, pady=8)
 
-    # Verwendungszweck
     ttk.Label(frame, text='Verwendungszweck').grid(row=5, column=0, sticky=W, padx=5, pady=8)
     entry_verwendungszweck = ttk.Entry(frame)
     entry_verwendungszweck.grid(row=5, column=1, sticky=EW, padx=5, pady=8)
@@ -75,13 +70,13 @@ def setup(master)->ttk.Frame:
     def klick_rechnung_eingabe():
         person = combo_person.get()
         if not person:
-            print("Keine Person ausgewählt")
+            messagebox.showerror("Unvollständige Angaben","Keine Person ausgewählt")
             return
         person_id = personen_dict[person]
 
         rechnungssteller = combo_rechnungssteller.get()
         if not rechnungssteller:
-            print("Kein Rechnungssteller ausgewählt")
+            messagebox.showerror("Unvollständige Angaben","Kein Rechnungssteller ausgewählt")
             return
 
         betrag = entry_betrag.get()
@@ -93,36 +88,30 @@ def setup(master)->ttk.Frame:
         verwendungszweck = entry_verwendungszweck.get()
         datum = entry_datum.entry.get()
 
-        ist_eingefuegt = neue_rechnung_erfassen(
+        ist_eingefuegt, message = neue_rechnung_erfassen(
             person_id,
             rechnungssteller,
             datum,
             betrag,
             verwendungszweck)
         if ist_eingefuegt:
-            title = "✅ Rechnung erfolgreich eingefügt."
-            messagebox.showinfo(title, f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {verwendungszweck} vom {datum}.")
-            title_var.set(title)
+            messagebox.showinfo("Info", message)
+            eingabe_button.configure(state="disabled")
+        else:
+            messagebox.showerror("Fehler beim Einfügen", message)
 
+        if entry_iban.get() != "":
             image = erzeuge_epc_qr_code(rechnungssteller, betrag, verwendungszweck)
             img = ImageTk.PhotoImage(image)
             qr_code_label.configure(image=img)
             qr_code_label.image = img
 
-            eingabe_button.configure(state="disabled")
-
-        else:
-            messagebox.showerror("❌ Rechnung nicht eingefügt.", f"{person} -> {rechnungssteller}: € {betrag}, Vwz: {verwendungszweck} vom {datum}.")
-
     eingabe_button = ttk.Button(frame, text="Eingabe", bootstyle="success", command=klick_rechnung_eingabe)
     eingabe_button.grid(row=6, column=0, columnspan=2, sticky=EW, pady=20)
 
-    title_var = ttk.StringVar()
-    qr_code_label = ttk.Label(frame, textvariable=title_var)
-    qr_code_label.grid(row=7, column=0, columnspan=2, pady=10)
 
     qr_code_label = ttk.Label(frame)
-    qr_code_label.grid(row=8, column=0, columnspan=2, pady=10)
+    qr_code_label.grid(row=7, column=0, columnspan=2, pady=10)
 
     return frame
 
