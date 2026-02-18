@@ -3,6 +3,7 @@ from ttkbootstrap.constants import *
 import views.neue_rechnung_view
 import views.rechnungssteller_anlegen_view
 import views.rechnungssteller_aktualisieren_view
+import views.person_anlegen_view
 
 class App(ttk.Window):
     FONT = ("Segoe UI", 18)
@@ -32,19 +33,14 @@ class App(ttk.Window):
             command=self.show_neue_rechnung
         ).pack(fill=X, pady=5)
 
+
         ttk.Button(
             self.sidebar,
             text="Rechnungssteller",
             bootstyle="light",
-            command=self.show_rechnungssteller_erfassen
+            command=self.show_rechnungssteller_uebersicht
         ).pack(fill=X, pady=5)
 
-        ttk.Button(
-            self.sidebar,
-            text="IBAN",
-            bootstyle="light",
-            command=self.show_rechnungssteller_aktualisieren
-        ).pack(fill=X, pady=5)
 
         ttk.Button(
             self.sidebar,
@@ -83,22 +79,32 @@ class App(ttk.Window):
     def show_personen(self):
         self.clear_content()
         ttk.Label(self.content, text="Personenverwaltung", font=self.FONT).pack()
+        nb = ttk.Notebook(self.content)
+        nb.pack(
+            side=LEFT,
+            padx=(10, 0),
+            expand=YES,
+            fill=BOTH
+        )
+        nb.add(views.person_anlegen_view.setup(nb), text="Neue Person anlegen")
 
     def show_uebersicht(self):
         self.clear_content()
         ttk.Label(self.content, text="Übersicht", font=self.FONT).pack()
 
-    def show_rechnungssteller_erfassen(self):
+    def show_rechnungssteller_uebersicht(self):
         self.clear_content()
-        ttk.Label(self.content, text="Neuen Rechnungssteller erfassen", font=self.FONT).pack()
-        frame = views.rechnungssteller_anlegen_view.setup(self.content)
-        frame.pack(fill=X)
+        ttk.Label(self.content, text="Rechnungsstellerverwaltung", font=self.FONT).pack()
+        nb = ttk.Notebook(self.content)
+        nb.pack(
+            side=LEFT,
+            padx=(10, 0),
+            expand=YES,
+            fill=BOTH
+        )
+        nb.add(views.rechnungssteller_anlegen_view.setup(nb), text="Neuen Rechnungssteller anlegen")
+        nb.add(views.rechnungssteller_aktualisieren_view.setup(nb), text="IBAN aktualisieren")
 
-    def show_rechnungssteller_aktualisieren(self):
-        self.clear_content()
-        ttk.Label(self.content, text="IBAN aktualisieren", font=self.FONT).pack()
-        frame = views.rechnungssteller_aktualisieren_view.setup(self.content)
-        frame.pack(fill=X)
 
 
 
