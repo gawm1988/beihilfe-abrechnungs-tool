@@ -1,7 +1,6 @@
 import collections
 from datenbank.rechnung import read_rechnung
-from datenbank.rechnungssteller import read_rechnungssteller_by_name, create_rechnungssteller, \
-    read_alle_rechnungssteller_namen, update_iban
+from datenbank.rechnungssteller import *
 from schwifty import IBAN
 
 def ist_valide_iban(iban:str):
@@ -25,13 +24,20 @@ def neuen_rechnungsteller_erfassen(name:str, iban:str):
     create_rechnungssteller(name, iban)
     return True, f"Rechnungssteller {name} angelegt.\nIBAN: {iban}"
 
-def lade_alle_rechnungssteller()->dict[str, int]:
-    rechnungssteller = read_alle_rechnungssteller_namen()
+def lade_alle_rechnungssteller_iban()->dict[str, str]:
+    rechnungssteller = read_alle_rechnungssteller_mit_iban()
     rechnungssteller_dict = {
-        f"{name}": iban
+        name: iban
         for name, iban in rechnungssteller
     }
     return collections.OrderedDict(sorted(rechnungssteller_dict.items()))
+
+def lade_alle_rechnungssteller() -> dict[int, str]:
+    rechnungssteller = read_alle_rechnungssteller()
+    return {
+        rid: name
+        for rid, name in rechnungssteller
+    }
 
 def iban_aktualisieren(name:str, iban:str):
     if not ist_valide_iban(iban):

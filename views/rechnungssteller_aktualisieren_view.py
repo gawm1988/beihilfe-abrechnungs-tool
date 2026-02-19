@@ -3,14 +3,14 @@ from tkinter import messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from services.rechnungssteller_services import lade_alle_rechnungssteller, iban_aktualisieren
+from services.rechnungssteller_services import lade_alle_rechnungssteller_iban, iban_aktualisieren
 
 
 def setup(master)->ttk.Frame:
     frame = ttk.Frame(master, padding=20)
     frame.columnconfigure(1, weight=1)
 
-    rechnungssteller_dict = lade_alle_rechnungssteller()
+    rechnungssteller_dict = lade_alle_rechnungssteller_iban()
 
     ttk.Label(frame, text="Rechnungssteller").grid(row=0, column=0, sticky=W, padx=5, pady=8)
 

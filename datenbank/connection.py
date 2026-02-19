@@ -1,9 +1,11 @@
 import sqlite3
 import os
 
-def connect():
+DATABASE_NAME = "beihilfe.db"
+
+def connect(database_name: str = DATABASE_NAME):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    DB_PATH = os.path.join(BASE_DIR, "datenbank/beihilfe.db")
+    DB_PATH = os.path.join(BASE_DIR, f"datenbank/{database_name}")
     return sqlite3.connect(DB_PATH)
 
 

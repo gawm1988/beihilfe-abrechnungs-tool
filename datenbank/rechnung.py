@@ -1,5 +1,4 @@
 from .connection import connect
-from .person import read_person_by_name
 
 class RechnungDTO:
     id: int
@@ -18,6 +17,8 @@ class RechnungDTO:
         self.betrag = betrag
         self.verwendungszweck = verwendungszweck
 
+    def __str__(self):
+        return f"{self.person_id} → {self.rechnungssteller_id}:\n€ {self.betrag}\nVWZ: {self.verwendungszweck}\nvom {self.rechnungsdatum}\n"
 
 def create_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str) -> bool:
     with connect() as conn:
@@ -35,33 +36,24 @@ def read_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str,
             return None
         return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5])
 
-def read_offene_rechnungen(person_vorname: str, person_nachname: str):
-    person = read_person_by_name(person_vorname, person_nachname)
-    if not person:
-        print(f"Person nicht vorhanden: {person_vorname} {person_nachname}.")
-        return []
-
-    person_id = person[0]
+def read_offene_rechnungen_von_person_id(person_id: int):
     with connect() as conn:
         cursor = conn.cursor()
-        return cursor.execute(
+        rechnungen = []
+        fetch = cursor.execute(
             "SELECT * FROM rechnung WHERE person_id=? AND abrechnungsdatum IS NULL",
             (person_id,)
         ).fetchall()
+        if fetch is None:
+            return None
+        for f in fetch:
+            rechnungen.append(RechnungDTO(f[0], f[1], f[2], f[3], f[4], f[5]))
+        return rechnungen
 
-def update_datum_rechnungen(person_vorname: str, person_nachname: str, datum: str):
-    rechnungen = read_offene_rechnungen(person_vorname, person_nachname)
-    if not rechnungen:
-        print(f"Keine offenen Rechnungen für {person_vorname} {person_nachname}.")
-        return
-
-    person = read_person_by_name(person_vorname, person_nachname)
-    person_id = person[0]
-
+def update_abrechnungsdatum(rechnung_id: int):
     with connect() as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE rechnung SET abrechnungsdatum=? WHERE person_id=? AND abrechnungsdatum IS NULL",
-            (datum, person_id)
+            "UPDATE rechnung SET abrechnungsdatum=? WHERE id=?",
+            (rechnung_id, )
         )
-        print(f"Abrechnungsdatum aktualisiert auf {datum} für {person_vorname} {person_nachname}.")

@@ -1,4 +1,3 @@
-import os
 from tkinter import messagebox
 import ttkbootstrap as ttk
 from PIL import Image, ImageTk
@@ -7,7 +6,7 @@ from ttkbootstrap.widgets import DateEntry
 
 from datenbank.person import read_all_personen
 from services.rechnung_services import *
-from services.rechnungssteller_services import lade_alle_rechnungssteller
+from services.rechnungssteller_services import lade_alle_rechnungssteller_iban
 
 
 def setup(master)->ttk.Frame:
@@ -31,7 +30,7 @@ def setup(master)->ttk.Frame:
     )
     combo_person.grid(row=0, column=1, sticky=EW, padx=5, pady=8)
 
-    rechnungssteller_dict = lade_alle_rechnungssteller()
+    rechnungssteller_dict = lade_alle_rechnungssteller_iban()
 
     ttk.Label(frame, text="Rechnungssteller").grid(row=1, column=0, sticky=W, padx=5, pady=8)
 

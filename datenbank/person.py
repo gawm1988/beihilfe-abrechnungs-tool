@@ -12,6 +12,9 @@ class PersonDTO:
         self.nachname = nachname
         self.beihilfesatz = beihilfesatz
 
+    def __str__(self):
+        return f"{self.vorname} {self.nachname}"
+
 
 def create_person(vorname: str, nachname: str, beihilfesatz: float = 0.0):
     with connect() as conn:
@@ -22,6 +25,14 @@ def read_person_by_name(vorname: str, nachname: str):
     with connect() as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM person WHERE vorname=? AND nachname=?",(vorname, nachname)).fetchone()
+        if fetch is None:
+            return None
+        return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])
+
+def read_person_by_id(person_id: int):
+    with connect() as conn:
+        cursor = conn.cursor()
+        fetch = cursor.execute("SELECT * FROM person WHERE id=?",(person_id,)).fetchone()
         if fetch is None:
             return None
         return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])

@@ -10,6 +10,9 @@ class RechnungstellerDTO:
         self.name = name
         self.iban = iban
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 def create_rechnungssteller(name: str, iban: str):
     with connect() as conn:
@@ -32,10 +35,15 @@ def read_rechnungssteller_by_id(rechnungsteller_id: int)->RechnungstellerDTO:
             return None
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
-def read_alle_rechnungssteller_namen():
+def read_alle_rechnungssteller_mit_iban():
     with connect() as conn:
         cursor = conn.cursor()
         return cursor.execute("SELECT name, iban FROM rechnungssteller").fetchall()
+
+def read_alle_rechnungssteller():
+    with connect() as conn:
+        cursor = conn.cursor()
+        return cursor.execute("SELECT id, name FROM rechnungssteller").fetchall()
 
 def update_iban(name: str, iban: str):
     with connect() as conn:
