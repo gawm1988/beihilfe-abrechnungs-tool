@@ -1,11 +1,14 @@
-from tkinter import messagebox
 import tkinter as tk
+from functools import partial
+from tkinter import messagebox
+
 import ttkbootstrap as ttk
+from PIL import ImageTk
 from ttkbootstrap.constants import *
 
 from datenbank.person import read_all_personen
 from services.rechnung_services import *
-from services.rechnungssteller_services import lade_alle_rechnungssteller
+from services.rechnungssteller_services import lade_alle_rechnungssteller, lade_iban
 
 
 def setup(master) -> ttk.Frame:
@@ -112,6 +115,46 @@ def setup(master) -> ttk.Frame:
             label = ttk.Label(card, text=text, justify=LEFT)
             label.pack(anchor="w", fill=BOTH, expand=YES)
 
+            button_frame = ttk.Frame(card)
+            button_frame.pack(anchor="e", pady=5)
+
+            def upload_pdf(rechnung_id):
+                rechnung_pdf_speichern(rechnung_id)
+                on_person_select(None)
+
+            def lade_qr_code(rechnungsteller_name, betrag, verwendungszweck):
+                image = erzeuge_epc_qr_code(rechnungssteller_name, betrag, verwendungszweck)
+                img = ImageTk.PhotoImage(image)
+                qr_code_label.configure(image=img)
+                qr_code_label.image = img
+
+            if lade_iban(rechnungssteller_name):
+                ttk.Button(
+                    button_frame,
+                    text="🔳",
+                    width=3,
+                    bootstyle="info-outline",
+                    command=partial(lade_qr_code, rechnungssteller_name, betrag, verwendungszweck)
+                ).pack(side="left", padx=3)
+
+            if r.pdf_path:
+                ttk.Button(
+                    button_frame,
+                    text="👁",
+                    width=3,
+                    bootstyle="secondary-outline",
+                    command=lambda p=r.pdf_path: pdf_oeffnen_und_anzeigen(p)
+                ).pack(side="left", padx=3)
+
+            else:
+                ttk.Button(
+                    button_frame,
+                    text="📎",
+                    width=3,
+                    bootstyle="secondary-outline",
+                    command=partial(upload_pdf, r.id)
+                ).pack(side="left", padx=3)
+
             def update_wraplength(event):
                 label.config(wraplength=event.width)
 
@@ -119,7 +162,11 @@ def setup(master) -> ttk.Frame:
 
     combo_person.bind("<<ComboboxSelected>>", on_person_select)
 
+    qr_code_label = ttk.Label(frame)
+    qr_code_label.grid(row=5, column=0, columnspan=2, pady=10)
+
     return frame
+
 
 if __name__ == "__main__":
     app = ttk.Window()

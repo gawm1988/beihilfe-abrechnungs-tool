@@ -1,11 +1,9 @@
 import sqlite3
 import os
 
-DATABASE_NAME = "beihilfe.db"
+from utils.paths import DB_PATH
 
-def connect(database_name: str = DATABASE_NAME):
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    DB_PATH = os.path.join(BASE_DIR, f"datenbank/{database_name}")
+def connect():
     return sqlite3.connect(DB_PATH)
 
 
@@ -35,6 +33,7 @@ def create_tabellen():
                 rechnungsdatum DATE NOT NULL,
                 betrag REAL NOT NULL,
                 verwendungszweck TEXT NOT NULL,
+                pdf_path TEXT,
                 abrechnungsdatum DATE
             )
         """)

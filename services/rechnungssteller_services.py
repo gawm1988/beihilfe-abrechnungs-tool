@@ -55,6 +55,13 @@ def iban_aktualisieren(name: str, iban: str) -> (bool, str):
     update_iban(name, iban)
     return True, f"Rechnungssteller {name} aktualisiert.\nIBAN: {iban}"
 
+def lade_iban(rechnungsteller_name:str):
+    rechnungstellerDTO = read_rechnungssteller_by_name(rechnungsteller_name)
+    if not rechnungstellerDTO:
+        return None
+    else:
+        return rechnungstellerDTO.iban
+
 
 if __name__ == '__main__':
     # print(ist_valide_iban("GB33BUKB20201555555555"))
