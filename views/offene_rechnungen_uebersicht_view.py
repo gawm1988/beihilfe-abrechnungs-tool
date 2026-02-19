@@ -76,7 +76,6 @@ def setup(master) -> ttk.Frame:
         person = combo_person.get()
         person_id = personen_dict.get(person)
 
-        # Alte Einträge löschen
         for widget in rechnungen_frame.winfo_children():
             widget.destroy()
 
@@ -110,11 +109,13 @@ def setup(master) -> ttk.Frame:
                 f"Datum: {rechnungsdatum}"
             )
 
-            ttk.Label(
-                card,
-                text=text,
-                justify=LEFT
-            ).pack(anchor="w")
+            label = ttk.Label(card, text=text, justify=LEFT)
+            label.pack(anchor="w", fill=BOTH, expand=YES)
+
+            def update_wraplength(event):
+                label.config(wraplength=event.width)
+
+            label.bind("<Configure>", update_wraplength)
 
     combo_person.bind("<<ComboboxSelected>>", on_person_select)
 
