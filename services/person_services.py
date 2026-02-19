@@ -1,5 +1,6 @@
-from datenbank.person import *
 import re
+
+from datenbank.person import *
 
 
 def neue_person_erfassen(vorname: str, nachname: str, beihilfesatz: str):
@@ -14,9 +15,11 @@ def neue_person_erfassen(vorname: str, nachname: str, beihilfesatz: str):
     create_person(vorname, nachname, beihilfesatz)
     return True, f"Person: {vorname} {nachname} eingefügt."
 
-if __name__ == '__main__':
-    neue_person_erfassen("Heinz", "Müller")
 
 def ist_gueltiger_beihilfesatz(s: str) -> bool:
     pattern = r"^0[.,]\d{1,2}$"
     return re.fullmatch(pattern, s) is not None
+
+
+if __name__ == '__main__':
+    neue_person_erfassen("Heinz", "Müller")

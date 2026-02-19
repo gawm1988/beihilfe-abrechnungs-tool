@@ -1,10 +1,14 @@
 import re
-from datenbank.rechnung import create_rechnung, read_rechnung, read_offene_rechnungen_von_person_id
-from datenbank.rechnungssteller import read_rechnungssteller_by_id, read_rechnungssteller_by_name
-from datenbank.person import read_person_by_id
-from qr_codes.epc_qr_code import create_epc_qrcode
 
-def neue_rechnung_erfassen(person_id: int,rechnungssteller: str,datum: str,betrag: str,verwendungszweck: str):
+from datenbank.person import read_person_by_id
+from datenbank.rechnung import *
+from datenbank.rechnung import RechnungDTO
+from datenbank.rechnungssteller import read_rechnungssteller_by_name
+from qr_codes.epc_qr_code import create_epc_qrcode
+from datetime import datetime
+
+
+def neue_rechnung_erfassen(person_id: int, rechnungssteller: str, rechnungsdatum: str, betrag: str, verwendungszweck: str):
     try:
         betrag = float(betrag.replace(",", "."))
     except ValueError:
@@ -14,12 +18,12 @@ def neue_rechnung_erfassen(person_id: int,rechnungssteller: str,datum: str,betra
     if not rechnungsstellerDTO:
         return False, "Rechnungssteller existiert nicht."
     rechnungssteller_id = rechnungsstellerDTO.id
-
-    rechnungDTO = read_rechnung(person_id,rechnungssteller_id,datum,betrag,verwendungszweck)
+    rechnungsdatum_iso = datum_to_iso(rechnungsdatum)
+    rechnungDTO = read_rechnung(person_id, rechnungssteller_id, rechnungsdatum_iso, betrag, verwendungszweck)
     if rechnungDTO:
         return False, "Rechnung existiert bereits."
 
-    create_rechnung(person_id,rechnungssteller_id,datum,betrag,verwendungszweck)
+    create_rechnung(person_id, rechnungssteller_id, rechnungsdatum_iso, betrag, verwendungszweck)
     return True, "Rechnung eingefügt."
 
 
@@ -27,9 +31,11 @@ def ist_gueltiger_betrag(betrag_str: str) -> bool:
     pattern = r"^\d+([.,]\d{1,2})?$"
     return re.fullmatch(pattern, betrag_str) is not None
 
-def erzeuge_epc_qr_code(rechnungsteller:str, betrag:float, verwendungszweck:str):
+
+def erzeuge_epc_qr_code(rechnungsteller: str, betrag: float, verwendungszweck: str):
     rechnungstellerDTO = read_rechnungssteller_by_name(rechnungsteller)
-    return create_epc_qrcode(rechnungstellerDTO.name,rechnungstellerDTO.iban,betrag,verwendungszweck)
+    return create_epc_qrcode(rechnungstellerDTO.name, rechnungstellerDTO.iban, betrag, verwendungszweck)
+
 
 def alle_offenen_rechnungen_von_person(person_id: int):
     personDTO = read_person_by_id(person_id)
@@ -40,7 +46,32 @@ def alle_offenen_rechnungen_von_person(person_id: int):
         return None, "Keine offenen Rechnungen vorhanden."
     return rechnungen, "Rechnungen erfolgreich geladen."
 
+def ist_gueltiges_datum(datum_str: str) -> bool:
+    try:
+        datetime.strptime(datum_str, "%d.%m.%Y")
+        return True
+    except ValueError:
+        return False
+
+def datum_to_iso(datum_str: str) -> str:
+    return datetime.strptime(datum_str, "%d.%m.%Y").strftime("%Y-%m-%d")
+
+def datum_iso_to_aneige(datum_iso: str) -> str:
+    return datetime.strptime(datum_iso, "%Y-%m-%d").strftime("%d.%m.%Y")
+
+
+def setze_abrechnungsdatum(rechnungen:list[RechnungDTO], abrechnungsdatum:str) -> (bool,str):
+    if rechnungen is None:
+        return False, "Keine Rechnungen ausgewählt."
+    if not ist_gueltiges_datum(abrechnungsdatum):
+        return False, "Abrechnungsdatum ungültig."
+    for re in rechnungen:
+        update_abrechnungsdatum(re.id, datum_to_iso(abrechnungsdatum))
+    return True, "Abrechnungsdatum erfolgreich gesetzt."
+
+
 if __name__ == '__main__':
-    rechnungen,_ = alle_offenen_rechnungen_von_person(1)
-    for r in rechnungen:
-        print(r)
+    rechnungen, _ = alle_offenen_rechnungen_von_person(4)
+
+    a, msg = setze_abrechnungsdatum(rechnungen, "29.01.2024")
+    print(msg)

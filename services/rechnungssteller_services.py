@@ -1,9 +1,11 @@
 import collections
-from datenbank.rechnung import read_rechnung
-from datenbank.rechnungssteller import *
+
 from schwifty import IBAN
 
-def ist_valide_iban(iban:str):
+from datenbank.rechnungssteller import *
+
+
+def ist_valide_iban(iban: str):
     if iban == "":
         return True
     try:
@@ -13,7 +15,7 @@ def ist_valide_iban(iban:str):
         return False
 
 
-def neuen_rechnungsteller_erfassen(name:str, iban:str):
+def neuen_rechnungsteller_erfassen(name: str, iban: str) -> (bool, str):
     rechnungstellerDTO = read_rechnungssteller_by_name(name)
     if rechnungstellerDTO:
         return False, "Rechnungssteller existiert bereits."
@@ -24,13 +26,15 @@ def neuen_rechnungsteller_erfassen(name:str, iban:str):
     create_rechnungssteller(name, iban)
     return True, f"Rechnungssteller {name} angelegt.\nIBAN: {iban}"
 
-def lade_alle_rechnungssteller_iban()->dict[str, str]:
+
+def lade_alle_rechnungssteller_iban() -> dict[str, str]:
     rechnungssteller = read_alle_rechnungssteller_mit_iban()
     rechnungssteller_dict = {
         name: iban
         for name, iban in rechnungssteller
     }
     return collections.OrderedDict(sorted(rechnungssteller_dict.items()))
+
 
 def lade_alle_rechnungssteller() -> dict[int, str]:
     rechnungssteller = read_alle_rechnungssteller()
@@ -39,7 +43,8 @@ def lade_alle_rechnungssteller() -> dict[int, str]:
         for rid, name in rechnungssteller
     }
 
-def iban_aktualisieren(name:str, iban:str):
+
+def iban_aktualisieren(name: str, iban: str) -> (bool, str):
     if not ist_valide_iban(iban):
         return False, f"IBAN {iban} ist ungültig."
 
@@ -50,6 +55,7 @@ def iban_aktualisieren(name:str, iban:str):
     update_iban(name, iban)
     return True, f"Rechnungssteller {name} aktualisiert.\nIBAN: {iban}"
 
+
 if __name__ == '__main__':
-    #print(ist_valide_iban("GB33BUKB20201555555555"))
-    iban_aktualisieren("A","GB33BUKB20201555555555")
+    # print(ist_valide_iban("GB33BUKB20201555555555"))
+    iban_aktualisieren("A", "GB33BUKB20201555555555")

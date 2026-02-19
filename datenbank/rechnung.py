@@ -50,10 +50,10 @@ def read_offene_rechnungen_von_person_id(person_id: int):
             rechnungen.append(RechnungDTO(f[0], f[1], f[2], f[3], f[4], f[5]))
         return rechnungen
 
-def update_abrechnungsdatum(rechnung_id: int):
+def update_abrechnungsdatum(rechnung_id: int, abrechnungsdatum:str):
     with connect() as conn:
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE rechnung SET abrechnungsdatum=? WHERE id=?",
-            (rechnung_id, )
+            (abrechnungsdatum,rechnung_id)
         )
