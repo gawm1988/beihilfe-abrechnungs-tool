@@ -9,7 +9,12 @@
 - [x] [#006] GUI für IBAN Aktualisierung
 - [x] [#007] GUI für Übersicht der offenen Rechnungen
 - [x] [#008] GUI für Neuanlage von Personen
+- [ ] [#009] Neue Tabelle für Abrechnungen (ID, Person_ID, Datum, Gesamtbetrag, Erstattung Beihilfe, Erstatung Krankenkasse). Anpassung Tabelle Rechnung
+- [ ] [#010] Funktion zur Abrechnung von offenen Posten. Rückgabe Deckblatt (Positionen) und eine PDF mit allen offenen Rechnungen. 
 ## ☕ Mittlere Priorität
-- 
+- [ ] Schreiben von Tests
+- [ ] Anzeige von alten Abrechnungen je Person
+- [ ] Drag n Drop von Dateien
 
 ## ⏳ Niedrige Priorität
+- [ ] Automatisches Auslesen von Rechnungsdaten in PDFs (z.B. mit pdf2image)
