@@ -1,4 +1,3 @@
-from utils.paths import DB_PATH
 from .connection import connect
 
 
@@ -26,8 +25,8 @@ class RechnungDTO:
         return f"{self.person_id} → {self.rechnungssteller_id}:\n€ {self.betrag}\nVWZ: {self.verwendungszweck}\nvom {self.rechnungsdatum}\n"
 
 
-def create_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str,
-                    db_path=DB_PATH) -> bool:
+def create_rechnung(db_path:str, person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str,
+                    ) -> bool:
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -36,8 +35,8 @@ def create_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: st
         )
 
 
-def read_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str,
-                  db_path=DB_PATH):
+def read_rechnung(db_path:str, person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str,
+                  ):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute(
@@ -48,7 +47,7 @@ def read_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str,
         return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
 
 
-def read_rechnung_by_id(rechnung_id: int, db_path=DB_PATH):
+def read_rechnung_by_id(db_path:str, rechnung_id: int):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute(
@@ -59,7 +58,7 @@ def read_rechnung_by_id(rechnung_id: int, db_path=DB_PATH):
         return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
 
 
-def read_offene_rechnungen_von_person_id(person_id: int, db_path=DB_PATH):
+def read_offene_rechnungen_von_person_id(db_path:str, person_id: int):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         rechnungen = []
@@ -74,7 +73,7 @@ def read_offene_rechnungen_von_person_id(person_id: int, db_path=DB_PATH):
         return rechnungen
 
 
-def update_abrechnungsdatum(rechnung_id: int, abrechnungsdatum: str, db_path=DB_PATH):
+def update_abrechnungsdatum(db_path:str, rechnung_id: int, abrechnungsdatum: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
@@ -83,7 +82,7 @@ def update_abrechnungsdatum(rechnung_id: int, abrechnungsdatum: str, db_path=DB_
         )
 
 
-def update_pdf_path(rechnung_id: int, pdf_path: str, db_path=DB_PATH):
+def update_pdf_path(db_path:str, rechnung_id: int, pdf_path: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(

@@ -1,4 +1,3 @@
-from utils.paths import DB_PATH
 from .connection import connect
 
 
@@ -16,13 +15,13 @@ class RechnungstellerDTO:
         return f"{self.name}"
 
 
-def create_rechnungssteller(name: str, iban: str, db_path=DB_PATH):
+def create_rechnungssteller(db_path:str, name: str, iban: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("INSERT INTO rechnungssteller (name,iban) VALUES (?,?)", (name, iban))
 
 
-def read_rechnungssteller_by_name(name: str, db_path=DB_PATH) -> RechnungstellerDTO:
+def read_rechnungssteller_by_name(db_path:str, name: str) -> RechnungstellerDTO:
     with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
@@ -31,7 +30,7 @@ def read_rechnungssteller_by_name(name: str, db_path=DB_PATH) -> Rechnungsteller
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
 
-def read_rechnungssteller_by_id(rechnungsteller_id: int, db_path=DB_PATH) -> RechnungstellerDTO:
+def read_rechnungssteller_by_id(db_path:str, rechnungsteller_id: int) -> RechnungstellerDTO:
     with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE id=?", (rechnungsteller_id,)).fetchone()
@@ -40,19 +39,19 @@ def read_rechnungssteller_by_id(rechnungsteller_id: int, db_path=DB_PATH) -> Rec
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
 
-def read_alle_rechnungssteller_mit_iban(db_path=DB_PATH):
+def read_alle_rechnungssteller_mit_iban(db_path):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         return cursor.execute("SELECT name, iban FROM rechnungssteller").fetchall()
 
 
-def read_alle_rechnungssteller(db_path=DB_PATH):
+def read_alle_rechnungssteller(db_path):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         return cursor.execute("SELECT id, name FROM rechnungssteller").fetchall()
 
 
-def update_iban(name: str, iban: str, db_path=DB_PATH):
+def update_iban(db_path:str, name: str, iban: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("UPDATE rechnungssteller SET iban = ? WHERE name = ?", (iban, name))

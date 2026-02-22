@@ -1,13 +1,10 @@
 import sqlite3
 
-from utils.paths import DB_PATH
-
-
-def connect(db_path=DB_PATH):
+def connect(db_path:str):
     return sqlite3.connect(db_path)
 
 
-def create_tabellen(db_path=DB_PATH):
+def create_tabellen(db_path:str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("""

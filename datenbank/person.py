@@ -1,4 +1,3 @@
-from utils.paths import DB_PATH
 from .connection import connect
 
 
@@ -18,14 +17,14 @@ class PersonDTO:
         return f"{self.vorname} {self.nachname}"
 
 
-def create_person(vorname: str, nachname: str, beihilfesatz: float = 0.0, db_path=DB_PATH):
+def create_person(db_path: str, vorname: str, nachname: str, beihilfesatz: float = 0.0):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("INSERT INTO person (vorname,nachname,beihilfesatz) VALUES (?,?,?)",
                        (vorname, nachname, beihilfesatz))
 
 
-def read_person_by_name(vorname: str, nachname: str, db_path=DB_PATH):
+def read_person_by_name(db_path: str, vorname: str, nachname: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM person WHERE vorname=? AND nachname=?", (vorname, nachname)).fetchone()
@@ -34,7 +33,7 @@ def read_person_by_name(vorname: str, nachname: str, db_path=DB_PATH):
         return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])
 
 
-def read_person_by_id(person_id: int, db_path=DB_PATH):
+def read_person_by_id(db_path: str, person_id: int):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM person WHERE id=?", (person_id,)).fetchone()
@@ -43,7 +42,7 @@ def read_person_by_id(person_id: int, db_path=DB_PATH):
         return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])
 
 
-def read_all_personen(db_path=DB_PATH):
+def read_all_personen(db_path: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         return cursor.execute("SELECT id, vorname, nachname FROM person").fetchall()
