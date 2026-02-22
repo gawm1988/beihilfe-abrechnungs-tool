@@ -91,7 +91,7 @@ def setup(master) -> ttk.Frame:
 
         for index, r in enumerate(rechnungen):
             rechnungssteller_name = rechnungssteller_dict.get(r.rechnungssteller_id)
-            rechnungsdatum = datum_iso_to_aneige(r.rechnungsdatum)
+            rechnungsdatum = datum_iso_to_deutsches_format(r.rechnungsdatum)
             betrag = r.betrag
             verwendungszweck = r.verwendungszweck
 
