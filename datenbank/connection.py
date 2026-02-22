@@ -1,14 +1,14 @@
 import sqlite3
-import os
 
 from utils.paths import DB_PATH
 
-def connect():
-    return sqlite3.connect(DB_PATH)
+
+def connect(db_path=DB_PATH):
+    return sqlite3.connect(db_path)
 
 
-def create_tabellen():
-    with connect() as conn:
+def create_tabellen(db_path=DB_PATH):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS person (
