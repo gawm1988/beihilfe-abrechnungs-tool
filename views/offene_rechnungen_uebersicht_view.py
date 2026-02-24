@@ -6,8 +6,8 @@ import ttkbootstrap as ttk
 from PIL import ImageTk
 from ttkbootstrap.constants import *
 
-from datenbank.person import read_all_personen
 from services.rechnung_services import *
+from services.person_services import lade_alle_personen_dict
 from services.rechnungssteller_services import lade_alle_rechnungssteller_dict, lade_iban
 
 
@@ -17,11 +17,7 @@ def setup(master) -> ttk.Frame:
     frame.columnconfigure(1, weight=1)
     frame.rowconfigure(4, weight=1)
 
-    personen = read_all_personen()
-    personen_dict = {
-        f"{vorname} {nachname}": pid
-        for pid, vorname, nachname in personen
-    }
+    personen_dict = lade_alle_personen_dict()
 
     ttk.Label(frame, text="Person").grid(row=0, column=0, sticky=W, padx=5, pady=8)
 

@@ -15,7 +15,8 @@ def ist_valide_iban(iban: str):
         return True
     except ValueError:
         return False
-
+    except TypeError:
+        return False
 
 def neuen_rechnungsteller_erfassen(name: str, iban: str, db_path = DB_PATH) -> (bool, str):
     rechnungstellerDTO = read_rechnungssteller_by_name(db_path,name)

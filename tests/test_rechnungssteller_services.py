@@ -83,5 +83,8 @@ class Rechnungssteller_Test(TestCase):
         self.assertTrue(ist_valide_iban("DE02300606010002474689"))
         # nur gültige IBAN werden akzeptiert
         # https://ibanvalidieren.de/beispiele.html
+        self.assertFalse(ist_valide_iban(" "))
+        self.assertFalse(ist_valide_iban(None))
+        self.assertFalse(ist_valide_iban(2))
         self.assertFalse(ist_valide_iban("DE12345678901234567890"))
         self.assertFalse(ist_valide_iban("00DE123456789012345678"))
