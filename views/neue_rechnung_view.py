@@ -5,7 +5,7 @@ from ttkbootstrap.constants import *
 from ttkbootstrap.widgets import DateEntry
 
 from services.person_services import lade_alle_personen_dict
-from services.rechnung_services import ist_gueltiger_betrag, neue_rechnung_erfassen, erzeuge_epc_qr_code
+from services.rechnung_services import ist_gueltiger_betrag, neue_rechnung_erfassen_mit_rechnungssteller_namen, erzeuge_epc_qr_code
 from services.rechnungssteller_services import lade_alle_rechnungssteller_iban_dict
 
 
@@ -83,7 +83,7 @@ def setup(master)->ttk.Frame:
         verwendungszweck = entry_verwendungszweck.get()
         datum = entry_datum.entry.get()
 
-        ist_eingefuegt, message = neue_rechnung_erfassen(
+        ist_eingefuegt, message = neue_rechnung_erfassen_mit_rechnungssteller_namen(
             person_id,
             rechnungssteller,
             datum,
