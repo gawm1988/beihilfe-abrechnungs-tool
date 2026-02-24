@@ -45,4 +45,10 @@ def read_person_by_id(db_path: str, person_id: int):
 def read_all_personen(db_path: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
-        return cursor.execute("SELECT id, vorname, nachname FROM person").fetchall()
+        personen = cursor.execute("SELECT * FROM person").fetchall()
+        if not personen:
+            return None
+        personenDTOs = []
+        for p in personen:
+            personenDTOs.append(PersonDTO(p[0], p[1], p[2], p[3]))
+        return personenDTOs

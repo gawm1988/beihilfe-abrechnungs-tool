@@ -8,7 +8,7 @@ from ttkbootstrap.constants import *
 
 from datenbank.person import read_all_personen
 from services.rechnung_services import *
-from services.rechnungssteller_services import lade_alle_rechnungssteller, lade_iban
+from services.rechnungssteller_services import lade_alle_rechnungssteller_dict, lade_iban
 
 
 def setup(master) -> ttk.Frame:
@@ -82,7 +82,7 @@ def setup(master) -> ttk.Frame:
         for widget in rechnungen_frame.winfo_children():
             widget.destroy()
 
-        rechnungssteller_dict = lade_alle_rechnungssteller()
+        rechnungssteller_dict = lade_alle_rechnungssteller_dict()
 
         rechnungen, message = alle_offenen_rechnungen_von_person(person_id)
         if rechnungen is None:

@@ -15,6 +15,16 @@ def neue_person_erfassen(vorname: str, nachname: str, beihilfesatz: str, db_path
     create_person(db_path, vorname, nachname, beihilfesatz)
     return True, f"Person: {vorname} {nachname} eingefügt."
 
+def lade_alle_personen_dict(db_path=DB_PATH):
+    personenDTOs = read_all_personen(db_path)
+    if personenDTOs == None:
+        return None
+    personen_dict = {
+        f"{p.vorname} {p.nachname}": p.id
+        for p in personenDTOs
+    }
+
+    return personen_dict
 
 def ist_gueltiger_beihilfesatz(s: str) -> bool:
     pattern = r"^0[.,]\d{1,2}$"

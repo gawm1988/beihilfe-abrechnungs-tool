@@ -29,7 +29,7 @@ def neuen_rechnungsteller_erfassen(name: str, iban: str, db_path = DB_PATH) -> (
     return True, f"Rechnungssteller {name} angelegt.\nIBAN: {iban}"
 
 
-def lade_alle_rechnungssteller_iban(db_path=DB_PATH) -> dict[str, str]:
+def lade_alle_rechnungssteller_iban_dict(db_path=DB_PATH) -> dict[str, str]:
     rechnungssteller = read_alle_rechnungssteller_mit_iban(db_path)
     rechnungssteller_dict = {
         name: iban
@@ -38,7 +38,7 @@ def lade_alle_rechnungssteller_iban(db_path=DB_PATH) -> dict[str, str]:
     return collections.OrderedDict(sorted(rechnungssteller_dict.items()))
 
 
-def lade_alle_rechnungssteller(db_path=DB_PATH) -> dict[int, str]:
+def lade_alle_rechnungssteller_dict(db_path=DB_PATH) -> dict[int, str]:
     rechnungssteller = read_alle_rechnungssteller(db_path)
     return {
         rid: name

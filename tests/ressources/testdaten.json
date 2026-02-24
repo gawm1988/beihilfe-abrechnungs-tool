@@ -1,0 +1,42 @@
+{
+  "personen": [
+    {
+      "vorname": "Anton",
+      "nachname": "Anlagenbauer",
+      "beihilfesatz": "0,8"
+    },
+    {
+      "vorname": "Berta",
+      "nachname": "Bildhauerin",
+      "beihilfesatz": "0,75"
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Chemikermeister",
+      "beihilfesatz": "0,55"
+    },
+    {
+      "vorname": "Dora",
+      "nachname": "Dachdeckerin",
+      "beihilfesatz": "0.35"
+    }
+  ],
+  "rechnungssteller": [
+    {
+      "name": "Alte Apotheke",
+      "iban": ""
+    },
+    {
+      "name": "Betriebsärztin B. Berger",
+      "iban": "DE02120300000000202051"
+    },
+    {
+      "name": "Chirurgie Carstensen",
+      "iban": "DE02500105170137075030"
+    },
+    {
+      "name": "Dentist D. Dahlmann",
+      "iban": "DE02100500000054540402"
+    }
+  ]
+}

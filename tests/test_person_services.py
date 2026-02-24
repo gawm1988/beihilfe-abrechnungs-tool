@@ -1,24 +1,47 @@
+import json
+import os
+import tempfile
 from unittest import TestCase
 
-from services.person_services import ist_gueltiger_beihilfesatz, neue_person_erfassen
-from tests.test_setup import test_setup
-from utils.paths import DB_PATH
+from datenbank.connection import create_tabellen
+from services.person_services import ist_gueltiger_beihilfesatz, neue_person_erfassen, lade_alle_personen_dict
 
-DB_PATH = "test.db"
 
 class Test(TestCase):
+
+    def setUp(self):
+        self.db_path = os.path.join(
+            tempfile.gettempdir(),
+            f"{self._testMethodName}.db"
+        )
+        if os.path.exists(self.db_path):
+            try:
+                os.remove(self.db_path)
+            except PermissionError:
+                import time
+                time.sleep(0.1)
+                os.remove(self.db_path)
+        create_tabellen(self.db_path)
+
+    def testpersonen_anlegen(self):
+        # JSON-Datei öffnen
+        with open("./ressources/testdaten.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Personen aus JSON einfügen
+        for p in data["personen"]:
+            neue_person_erfassen(p["vorname"], p["nachname"], p["beihilfesatz"], self.db_path)
+
     def test_neue_person_erfassen(self):
-        test_setup()
         vorname = "Thea"
         nachname = "Testperson"
         beihilfesatz = "0,8"
         # neue Person anlegen
-        eingefuegt, _ = neue_person_erfassen(vorname, nachname, beihilfesatz,DB_PATH)
-        self.assertEqual(True, eingefuegt)
+        ist_eingefuegt, _ = neue_person_erfassen(vorname, nachname, beihilfesatz, self.db_path)
+        self.assertEqual(True, ist_eingefuegt)
         # neue Person schon vorhanden
-        eingefuegt, _ = neue_person_erfassen(vorname, nachname, beihilfesatz,DB_PATH)
-        self.assertEqual(False, eingefuegt)
-
+        ist_eingefuegt, _ = neue_person_erfassen(vorname, nachname, beihilfesatz, self.db_path)
+        self.assertEqual(False, ist_eingefuegt)
 
     def test_ist_gueltiger_beihilfesatz(self):
         # gültige Formate
@@ -34,3 +57,9 @@ class Test(TestCase):
         self.assertEqual(False, ist_gueltiger_beihilfesatz("1,2"))
         self.assertEqual(False, ist_gueltiger_beihilfesatz("1.2"))
         self.assertEqual(False, ist_gueltiger_beihilfesatz("a"))
+
+    def test_lade_alle_personen_dict(self):
+        self.assertEqual(None, lade_alle_personen_dict(self.db_path))
+        self.testpersonen_anlegen()
+        personen_dict = lade_alle_personen_dict(self.db_path)
+        self.assertEqual(4, len(personen_dict))
