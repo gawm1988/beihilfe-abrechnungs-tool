@@ -43,6 +43,11 @@ class Personen_Test(TestCase):
         # neue Person schon vorhanden
         ist_eingefuegt, _ = neue_person_erfassen(vorname, nachname, beihilfesatz, self.db_path)
         self.assertFalse(ist_eingefuegt)
+        leer = ""
+        ist_eingefuegt, _ = neue_person_erfassen(leer, nachname, self.db_path)
+        self.assertFalse(ist_eingefuegt)
+        ist_eingefuegt, _ = neue_person_erfassen(vorname, leer, self.db_path)
+        self.assertFalse(ist_eingefuegt)
 
     def test_ist_gueltiger_beihilfesatz(self):
         # gültige Formate
