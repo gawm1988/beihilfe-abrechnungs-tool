@@ -38,18 +38,16 @@ def read_rechnungssteller_by_id(db_path:str, rechnungsteller_id: int) -> Rechnun
             return None
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
-
-def read_alle_rechnungssteller_mit_iban(db_path):
-    with connect(db_path) as conn:
-        cursor = conn.cursor()
-        return cursor.execute("SELECT name, iban FROM rechnungssteller").fetchall()
-
-
 def read_alle_rechnungssteller(db_path):
     with connect(db_path) as conn:
         cursor = conn.cursor()
-        return cursor.execute("SELECT id, name FROM rechnungssteller").fetchall()
-
+        rechnungssteller = cursor.execute("SELECT * FROM rechnungssteller").fetchall()
+        if not rechnungssteller:
+            return None
+        rechnungstellerDTO_list = []
+        for r in rechnungssteller:
+            rechnungstellerDTO_list.append(RechnungstellerDTO(r[0], r[1], r[2]))
+        return rechnungstellerDTO_list
 
 def update_iban(db_path:str, name: str, iban: str):
     with connect(db_path) as conn:

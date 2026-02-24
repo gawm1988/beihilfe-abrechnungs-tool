@@ -16,12 +16,12 @@ def neue_person_erfassen(vorname: str, nachname: str, beihilfesatz: str, db_path
     return True, f"Person: {vorname} {nachname} eingefügt."
 
 def lade_alle_personen_dict(db_path=DB_PATH):
-    personenDTOs = read_all_personen(db_path)
-    if personenDTOs == None:
+    personenDTO_list = read_all_personen(db_path)
+    if not personenDTO_list:
         return None
     personen_dict = {
         f"{p.vorname} {p.nachname}": p.id
-        for p in personenDTOs
+        for p in personenDTO_list
     }
 
     return personen_dict

@@ -7,13 +7,14 @@ from datenbank.connection import create_tabellen
 from services.person_services import ist_gueltiger_beihilfesatz, neue_person_erfassen, lade_alle_personen_dict
 
 
-class Test(TestCase):
+class Personen_Test(TestCase):
 
     def setUp(self):
         self.db_path = os.path.join(
             tempfile.gettempdir(),
             f"{self._testMethodName}.db"
         )
+        print(self.db_path)
         if os.path.exists(self.db_path):
             try:
                 os.remove(self.db_path)
@@ -25,7 +26,7 @@ class Test(TestCase):
 
     def testpersonen_anlegen(self):
         # JSON-Datei öffnen
-        with open("./ressources/testdaten.json", "r", encoding="utf-8") as f:
+        with open("tests/ressources/testdaten.json", "r", encoding="utf-8") as f:
             data = json.load(f)
 
         # Personen aus JSON einfügen
@@ -38,25 +39,25 @@ class Test(TestCase):
         beihilfesatz = "0,8"
         # neue Person anlegen
         ist_eingefuegt, _ = neue_person_erfassen(vorname, nachname, beihilfesatz, self.db_path)
-        self.assertEqual(True, ist_eingefuegt)
+        self.assertTrue(ist_eingefuegt)
         # neue Person schon vorhanden
         ist_eingefuegt, _ = neue_person_erfassen(vorname, nachname, beihilfesatz, self.db_path)
-        self.assertEqual(False, ist_eingefuegt)
+        self.assertFalse(ist_eingefuegt)
 
     def test_ist_gueltiger_beihilfesatz(self):
         # gültige Formate
-        self.assertEqual(True, ist_gueltiger_beihilfesatz("0,1"))
-        self.assertEqual(True, ist_gueltiger_beihilfesatz("0,12"))
-        self.assertEqual(True, ist_gueltiger_beihilfesatz("0.1"))
-        self.assertEqual(True, ist_gueltiger_beihilfesatz("0.12"))
+        self.assertTrue(ist_gueltiger_beihilfesatz("0,1"))
+        self.assertTrue(ist_gueltiger_beihilfesatz("0,12"))
+        self.assertTrue(ist_gueltiger_beihilfesatz("0.1"))
+        self.assertTrue(ist_gueltiger_beihilfesatz("0.12"))
         # ungültige Formate
-        self.assertEqual(False, ist_gueltiger_beihilfesatz("0,123"))
-        self.assertEqual(False, ist_gueltiger_beihilfesatz("0.123"))
-        self.assertEqual(False, ist_gueltiger_beihilfesatz("0"))
-        self.assertEqual(False, ist_gueltiger_beihilfesatz("1"))
-        self.assertEqual(False, ist_gueltiger_beihilfesatz("1,2"))
-        self.assertEqual(False, ist_gueltiger_beihilfesatz("1.2"))
-        self.assertEqual(False, ist_gueltiger_beihilfesatz("a"))
+        self.assertFalse(ist_gueltiger_beihilfesatz("0,123"))
+        self.assertFalse(ist_gueltiger_beihilfesatz("0.123"))
+        self.assertFalse(ist_gueltiger_beihilfesatz("0"))
+        self.assertFalse(ist_gueltiger_beihilfesatz("1"))
+        self.assertFalse(ist_gueltiger_beihilfesatz("1,2"))
+        self.assertFalse(ist_gueltiger_beihilfesatz("1.2"))
+        self.assertFalse(ist_gueltiger_beihilfesatz("a"))
 
     def test_lade_alle_personen_dict(self):
         self.assertEqual(None, lade_alle_personen_dict(self.db_path))

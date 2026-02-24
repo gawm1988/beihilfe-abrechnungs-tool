@@ -30,19 +30,23 @@ def neuen_rechnungsteller_erfassen(name: str, iban: str, db_path = DB_PATH) -> (
 
 
 def lade_alle_rechnungssteller_iban_dict(db_path=DB_PATH) -> dict[str, str]:
-    rechnungssteller = read_alle_rechnungssteller_mit_iban(db_path)
+    rechnungsstellerDTO_list = read_alle_rechnungssteller(db_path)
+    if not rechnungsstellerDTO_list:
+        return None
     rechnungssteller_dict = {
-        name: iban
-        for name, iban in rechnungssteller
+        r.name: r.iban
+        for r in rechnungsstellerDTO_list
     }
     return collections.OrderedDict(sorted(rechnungssteller_dict.items()))
 
 
 def lade_alle_rechnungssteller_dict(db_path=DB_PATH) -> dict[int, str]:
-    rechnungssteller = read_alle_rechnungssteller(db_path)
+    rechnungsstellerDTO_list = read_alle_rechnungssteller(db_path)
+    if not rechnungsstellerDTO_list:
+        return None
     return {
-        rid: name
-        for rid, name in rechnungssteller
+        r.id: r.name
+        for r in rechnungsstellerDTO_list
     }
 
 

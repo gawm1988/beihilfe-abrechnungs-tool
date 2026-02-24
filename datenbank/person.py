@@ -48,7 +48,7 @@ def read_all_personen(db_path: str):
         personen = cursor.execute("SELECT * FROM person").fetchall()
         if not personen:
             return None
-        personenDTOs = []
+        personenDTO_list = []
         for p in personen:
-            personenDTOs.append(PersonDTO(p[0], p[1], p[2], p[3]))
-        return personenDTOs
+            personenDTO_list.append(PersonDTO(p[0], p[1], p[2], p[3]))
+        return personenDTO_list
