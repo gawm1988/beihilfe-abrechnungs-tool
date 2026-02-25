@@ -71,8 +71,3 @@ def lade_iban(rechnungsteller_name:str, db_path=DB_PATH) -> (bool, str):
 
 def lade_rechnungssteller_by_name(name:str,db_path=DB_PATH):
     return read_rechnungssteller_by_name(db_path,name)
-
-
-if __name__ == '__main__':
-    # print(ist_valide_iban("GB33BUKB20201555555555"))
-    iban_aktualisieren("A", "GB33BUKB20201555555555")

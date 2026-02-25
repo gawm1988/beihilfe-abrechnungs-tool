@@ -98,10 +98,18 @@ class Rechnung_Test(TestCase):
         self.assertFalse(ist_eingefuegt)
 
     def test_create_epc_qrcode(self):
-        self.fail()
+        img = create_epc_qrcode("Testfirma","GB33BUKB20201555555555",12.34,"Testrechnung")
+        self.assertTrue(isinstance(img,Image.Image))
 
     def test_erzeuge_epc_qr_code(self):
-        self.fail()
+        neuen_rechnungsteller_erfassen("Testfirma", "", self.db_path)
+        rechnugnsstellerDTO = lade_rechnungssteller_by_name("Testfirma", self.db_path)
+        img = erzeuge_epc_qr_code(rechnugnsstellerDTO.name,12.34,"Testrechnung",self.db_path)
+        self.assertEqual(img,None)
+        neuen_rechnungsteller_erfassen("Testfirma1", "GB33BUKB20201555555555", self.db_path)
+        rechnugnsstellerDTO = lade_rechnungssteller_by_name("Testfirma1", self.db_path)
+        img = erzeuge_epc_qr_code(rechnugnsstellerDTO.name, 12.34, "Testrechnung", self.db_path)
+        self.assertTrue(isinstance(img, Image.Image))
 
     def test_alle_offenen_rechnungen_von_person(self):
         # Person existiert nicht
@@ -144,8 +152,4 @@ class Rechnung_Test(TestCase):
         self.assertEqual(datum_dt, datum_to_deutsches_format(datum_iso))
         self.assertEqual(None, datum_to_deutsches_format("01/31/2020"))
         self.assertEqual(None, datum_to_deutsches_format("a"))
-
-
-    def test_rechnung_pdf_speichern(self):
-        self.fail()
 

@@ -42,6 +42,3 @@ def pdf_oeffnen_und_anzeigen(hashwert:str):
         subprocess.run(["open", pdf_path])
     else:
         subprocess.run(["xdg-open", pdf_path])
-
-if __name__ == '__main__':
-    pdf_auswaehlen()

@@ -61,6 +61,9 @@ def erzeuge_epc_qr_code(rechnungsteller: str, betrag: float, verwendungszweck: s
     rechnungstellerDTO = read_rechnungssteller_by_name(db_path, rechnungsteller)
     if not rechnungstellerDTO:
         return None
+    elif rechnungstellerDTO.iban == "":
+        return None
+    print(rechnungstellerDTO.iban)
     return create_epc_qrcode(rechnungstellerDTO.name, rechnungstellerDTO.iban, betrag, verwendungszweck)
 
 
