@@ -30,7 +30,7 @@ def create_tabellen(db_path:str):
                 rechnungsdatum DATE NOT NULL,
                 betrag REAL NOT NULL,
                 verwendungszweck TEXT NOT NULL,
-                pdf_path TEXT,
+                hashwert TEXT,
                 abrechnungsdatum DATE
             )
         """)

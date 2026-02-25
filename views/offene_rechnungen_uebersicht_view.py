@@ -117,7 +117,7 @@ def setup(master) -> ttk.Frame:
 
             def upload_pdf(rechnung_id):
                 hashwert = pdf_laden_und_speichern()
-                rechnungspfad_speichern(rechnung_id, hashwert)
+                rechnung_hashwert_speichern(rechnung_id, hashwert)
                 on_person_select(None)
 
             def lade_qr_code(rechnungsteller_name, betrag, verwendungszweck):

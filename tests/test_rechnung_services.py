@@ -165,10 +165,14 @@ class Rechnung_Test(TestCase):
                                                    "Test-Rechnung", self.db_path)
         rechnungDTO = lade_rechnung_by_person_rechnungssteller_datum(personDTO.id, rechnungsstellerDTO.id, rechnungsdatum,self.db_path)
         hashwert = "0123456789abcdef"
-        rechnungspfad_speichern(rechnungDTO.id,hashwert,self.db_path)
+        ist_gespeichert,_ = rechnung_hashwert_speichern(rechnungDTO.id, hashwert, self.db_path)
         rechnungDTO = lade_rechnung_by_person_rechnungssteller_datum(personDTO.id, rechnungsstellerDTO.id,
                                                                      rechnungsdatum, self.db_path)
-        self.assertEqual(rechnungDTO.pdf_path,hashwert)
+        self.assertTrue(ist_gespeichert)
+        self.assertEqual(rechnungDTO.hashwert,hashwert)
+        ist_gespeichert, _ = rechnung_hashwert_speichern(rechnungDTO.id, hashwert, self.db_path)
+        self.assertFalse(ist_gespeichert)
+
 
     def test_lade_rechnung_by_person_rechnungssteller_datum(self):
         neue_person_erfassen("Theodor", "Testperson", "0.85", self.db_path)

@@ -9,17 +9,17 @@ class RechnungDTO:
     betrag: str
     verwendungszweck: str
     abrechnungsdatum: str
-    pdf_path: str
+    hashwert: str
 
     def __init__(self, id: int, person_id: int, rechnungsteller_id: int, rechnungsdatum: str, betrag: str,
-                 verwendungszweck: str, pdf_path: str):
+                 verwendungszweck: str, hashwert: str):
         self.id = id
         self.person_id = person_id
         self.rechnungssteller_id = rechnungsteller_id
         self.rechnungsdatum = rechnungsdatum
         self.betrag = betrag
         self.verwendungszweck = verwendungszweck
-        self.pdf_path = pdf_path
+        self.hashwert = hashwert
 
     def __str__(self):
         return f"{self.person_id} → {self.rechnungssteller_id}:\n€ {self.betrag}\nVWZ: {self.verwendungszweck}\nvom {self.rechnungsdatum}\n"
@@ -82,12 +82,12 @@ def update_abrechnungsdatum(db_path:str, rechnung_id: int, abrechnungsdatum: str
         )
 
 
-def update_pdf_path(db_path:str, rechnung_id: int, pdf_path: str):
+def update_hashwert(db_path:str, rechnung_id: int, hashwert: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE rechnung SET pdf_path=? WHERE id=?",
-            (pdf_path, rechnung_id)
+            "UPDATE rechnung SET hashwert=? WHERE id=?",
+            (hashwert, rechnung_id)
         )
 
 def read_rechnung_by_id_person_rechnungssteller(db_path:str, person_id:int, rechnungssteller_id:int, rechnungsdatum:str):
@@ -95,6 +95,17 @@ def read_rechnung_by_id_person_rechnungssteller(db_path:str, person_id:int, rech
         cursor = conn.cursor()
         fetch = cursor.execute(
             "SELECT * FROM rechnung WHERE person_id=? AND rechnungssteller_id=? AND rechnungsdatum=?",(person_id, rechnungssteller_id,rechnungsdatum)
+        ).fetchone()
+        if fetch is None:
+            return None
+        return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
+    
+def read_rechnung_by_hashwert(db_path:str, hashwert:str):
+    with connect(db_path) as conn:
+        cursor = conn.cursor()
+        fetch = cursor.execute(
+            "SELECT * FROM rechnung WHERE hashwert=?",
+            (hashwert,)
         ).fetchone()
         if fetch is None:
             return None

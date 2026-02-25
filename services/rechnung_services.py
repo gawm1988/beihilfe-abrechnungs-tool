@@ -107,10 +107,13 @@ def setze_abrechnungsdatum(rechnungen: list[RechnungDTO], abrechnungsdatum: str,
     return True, "Abrechnungsdatum erfolgreich gesetzt."
 
 
-def rechnungspfad_speichern(rechnung_id: int, hashwert:str, db_path: str = DB_PATH):
+def rechnung_hashwert_speichern(rechnung_id: int, hashwert:str, db_path: str = DB_PATH):
     if not hashwert:
         return False, "Upload nicht erfolgreich."
-    update_pdf_path(db_path, rechnung_id, hashwert)
+    ist_vorhanden = read_rechnung_by_hashwert(db_path, hashwert)
+    if ist_vorhanden:
+       return False, "Rechnung doppelt hinterlegt."
+    update_hashwert(db_path, rechnung_id, hashwert)
     return True, "Datei hochgeladen."
 
 def lade_rechnung_by_person_rechnungssteller_datum(person_id:int,rechnungssteller_id:int, rechnungsdatum:str, db_path: str = DB_PATH):

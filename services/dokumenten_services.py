@@ -1,6 +1,5 @@
 from tkinter import filedialog
 import hashlib
-from pathlib import Path
 import shutil
 import os
 import platform
