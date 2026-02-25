@@ -6,6 +6,7 @@ from unittest import TestCase
 from datenbank.connection import create_tabellen
 
 from services.rechnungssteller_services import *
+from utils.paths import TEST_RESOURCES_DIR
 
 
 class Rechnungssteller_Test(TestCase):
@@ -25,7 +26,7 @@ class Rechnungssteller_Test(TestCase):
         create_tabellen(self.db_path)
 
     def testrechnungssteller_anlegen(self):
-        with open("tests/ressources/testdaten.json", "r", encoding="utf-8") as f:
+        with open(TEST_RESOURCES_DIR, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         for r in data["rechnungssteller"]:
@@ -88,3 +89,10 @@ class Rechnungssteller_Test(TestCase):
         self.assertFalse(ist_valide_iban(2))
         self.assertFalse(ist_valide_iban("DE12345678901234567890"))
         self.assertFalse(ist_valide_iban("00DE123456789012345678"))
+
+    def test_lade_rechnungssteller_by_name(self):
+        name = "Testfirma"
+        self.assertEqual(None,lade_rechnungssteller_by_name(name,self.db_path))
+        neuen_rechnungsteller_erfassen(name,"",self.db_path)
+        rechnungsstellerDTO = lade_rechnungssteller_by_name(name,self.db_path)
+        self.assertEqual(name, rechnungsstellerDTO.name)

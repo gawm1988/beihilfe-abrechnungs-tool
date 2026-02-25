@@ -4,7 +4,9 @@ import tempfile
 from unittest import TestCase
 
 from datenbank.connection import create_tabellen
-from services.person_services import ist_gueltiger_beihilfesatz, neue_person_erfassen, lade_alle_personen_dict
+from services.person_services import ist_gueltiger_beihilfesatz, neue_person_erfassen, lade_alle_personen_dict, \
+    lade_person_by_name
+from utils.paths import TEST_RESOURCES_DIR
 
 
 class Personen_Test(TestCase):
@@ -25,11 +27,8 @@ class Personen_Test(TestCase):
         create_tabellen(self.db_path)
 
     def testpersonen_anlegen(self):
-        # JSON-Datei öffnen
-        with open("tests/ressources/testdaten.json", "r", encoding="utf-8") as f:
+        with open(TEST_RESOURCES_DIR, "r", encoding="utf-8") as f:
             data = json.load(f)
-
-        # Personen aus JSON einfügen
         for p in data["personen"]:
             neue_person_erfassen(p["vorname"], p["nachname"], p["beihilfesatz"], self.db_path)
 
@@ -69,3 +68,12 @@ class Personen_Test(TestCase):
         self.testpersonen_anlegen()
         personen_dict = lade_alle_personen_dict(self.db_path)
         self.assertEqual(4, len(personen_dict))
+
+    def test_lade_person_by_name(self):
+        vorname = "Tristan"
+        nachname = "Testperson"
+        self.assertEqual(None,lade_person_by_name(vorname,nachname,self.db_path))
+        neue_person_erfassen(vorname,nachname,"0,8",self.db_path)
+        personDTO = lade_person_by_name(vorname,nachname,self.db_path)
+        self.assertEqual(vorname,personDTO.vorname)
+        self.assertEqual(nachname,personDTO.nachname)

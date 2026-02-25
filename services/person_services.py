@@ -30,6 +30,10 @@ def ist_gueltiger_beihilfesatz(s: str) -> bool:
     pattern = r"^0[.,]\d{1,2}$"
     return re.fullmatch(pattern, s) is not None
 
+def lade_person_by_name(vorname:str, nachname:str, db_path=DB_PATH):
+    return read_person_by_name(db_path, vorname, nachname)
+
+
 
 if __name__ == '__main__':
     neue_person_erfassen("Heinz", "Müller")

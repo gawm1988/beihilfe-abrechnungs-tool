@@ -1,12 +1,101 @@
+import json
+import tempfile
 from unittest import TestCase
+
+from datenbank.connection import create_tabellen
+from services.person_services import neue_person_erfassen, lade_person_by_name
+from services.rechnung_services import *
+from services.rechnungssteller_services import neuen_rechnungsteller_erfassen, lade_rechnungssteller_by_name
+from utils.paths import TEST_RESOURCES_DIR
 
 
 class Rechnung_Test(TestCase):
+
+    def setUp(self):
+        self.db_path = os.path.join(
+            tempfile.gettempdir(),
+            f"{self._testMethodName}.db"
+        )
+        print(self.db_path)
+        if os.path.exists(self.db_path):
+            try:
+                os.remove(self.db_path)
+            except PermissionError:
+                import time
+                time.sleep(0.1)
+                os.remove(self.db_path)
+        create_tabellen(self.db_path)
+
+    def testrechnungen_anlegen(self):
+        with open(TEST_RESOURCES_DIR, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        for p in data["personen"]:
+            neue_person_erfassen(p["vorname"], p["nachname"], p["beihilfesatz"], self.db_path)
+        for r in data["rechnungssteller"]:
+            neuen_rechnungsteller_erfassen(r["name"], r["iban"], self.db_path)
+        for re in data["rechnungen"]:
+            neue_rechnung_erfassen(re["person_id"], re["rechnungssteller_id"], re["rechnungsdatum"], re["betrag"],
+                                   re["verwendungszweck"], self.db_path)
+
     def test_neue_rechnung_erfassen(self):
-        self.fail()
+        neue_person_erfassen("Theodor", "Testperson", "0.85", self.db_path)
+        personDTO = lade_person_by_name("Theodor", "Testperson", self.db_path)
+        neuen_rechnungsteller_erfassen("Testfirma", "", self.db_path)
+        rechnungsstellerDTO = lade_rechnungssteller_by_name("Testfirma", self.db_path)
+        # Betrag ungültig
+        ist_eingefuegt, _ = neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, "31.01.2020", "a",
+                                                   "Test-Rechnung", self.db_path)
+        self.assertFalse(ist_eingefuegt)
+        # Datum ungültig
+        ist_eingefuegt, _ = neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, "01/31/2020", "123,45",
+                                                   "Test-Rechnung", self.db_path)
+        self.assertFalse(ist_eingefuegt)
+
+        ist_eingefuegt, _ = neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, "31.01.2020", "123,45",
+                                                   "Test-Rechnung", self.db_path)
+        self.assertTrue(ist_eingefuegt)
+        # Bereits eingefügt
+        ist_eingefuegt, _ = neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, "31.01.2020", "123,45",
+                                                   "Test-Rechnung", self.db_path)
+        self.assertFalse(ist_eingefuegt)
 
     def test_ist_gueltiger_betrag(self):
-        self.fail()
+        self.assertTrue(ist_gueltiger_betrag("1"))
+        self.assertTrue(ist_gueltiger_betrag("0"))
+        self.assertTrue(ist_gueltiger_betrag("1,2"))
+        self.assertTrue(ist_gueltiger_betrag("1.2"))
+        self.assertTrue(ist_gueltiger_betrag("1,23"))
+        self.assertTrue(ist_gueltiger_betrag("1.23"))
+        self.assertFalse(ist_gueltiger_betrag("1,234"))
+        self.assertFalse(ist_gueltiger_betrag("1.234"))
+        self.assertFalse(ist_gueltiger_betrag("1,234,567"))
+        self.assertFalse(ist_gueltiger_betrag("1.234.567"))
+        self.assertFalse(ist_gueltiger_betrag("1.234,567"))
+        self.assertFalse(ist_gueltiger_betrag("1,234.567"))
+        self.assertFalse(ist_gueltiger_betrag("a"))
+        self.assertFalse(ist_gueltiger_betrag(" "))
+
+    def test_neue_rechnung_erfassen_mit_rechnungssteller_namen(self):
+        neue_person_erfassen("Theodor", "Testperson", "0.85", self.db_path)
+        personDTO = lade_person_by_name("Theodor", "Testperson", self.db_path)
+        neuen_rechnungsteller_erfassen("Testfirma", "", self.db_path)
+        rechnungsstellerDTO = lade_rechnungssteller_by_name("Testfirma", self.db_path)
+        # Betrag ungültig
+        ist_eingefuegt, _ = neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.name, "31.01.2020", "a",
+                                                   "Test-Rechnung", self.db_path)
+        self.assertFalse(ist_eingefuegt)
+        # Datum ungültig
+        ist_eingefuegt, _ = neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.name, "01/31/2020", "123,45",
+                                                   "Test-Rechnung", self.db_path)
+        self.assertFalse(ist_eingefuegt)
+
+        ist_eingefuegt, _ = neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.name, "31.01.2020", "123,45",
+                                                   "Test-Rechnung", self.db_path)
+        self.assertTrue(ist_eingefuegt)
+        # Bereits eingefügt
+        ist_eingefuegt, _ = neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.name, "31.01.2020", "123,45",
+                                                   "Test-Rechnung", self.db_path)
+        self.assertFalse(ist_eingefuegt)
 
     def test_create_epc_qrcode(self):
         self.fail()
@@ -15,22 +104,48 @@ class Rechnung_Test(TestCase):
         self.fail()
 
     def test_alle_offenen_rechnungen_von_person(self):
-        self.fail()
+        # Person existiert nicht
+        rechnungen, _ = alle_offenen_rechnungen_von_person(1, self.db_path)
+        self.assertEqual(None, rechnungen)
 
-    def test_ist_gueltiges_datum(self):
-        self.fail()
+        neue_person_erfassen("Theodor", "Testperson", "0.85", self.db_path)
+        personDTO = lade_person_by_name("Theodor", "Testperson", self.db_path)
+        neuen_rechnungsteller_erfassen("Testfirma", "", self.db_path)
+        rechnungsstellerDTO = lade_rechnungssteller_by_name("Testfirma", self.db_path)
+
+        # Keine Rechnung zu Person
+        rechnungen, _ = alle_offenen_rechnungen_von_person(personDTO.id, self.db_path)
+        self.assertEqual(None, rechnungen)
+
+        neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, "31.01.2020", "123,45",
+                               "Test-Rechnung", self.db_path)
+        neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, "31.01.2021", "123,45",
+                               "Test-Rechnung", self.db_path)
+
+        neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, "31.01.2022", "123,45",
+                               "Test-Rechnung", self.db_path)
+        rechnungen, _ = alle_offenen_rechnungen_von_person(personDTO.id, self.db_path)
+        self.assertEqual(3, len(rechnungen))
+
 
     def test_datum_to_iso(self):
-        self.fail()
+        datum_iso = "2020-01-31"
+        datum_dt = "31.01.2020"
+        self.assertEqual(datum_iso, datum_to_iso(datum_dt))
+        self.assertEqual(datum_iso, datum_to_iso(datum_iso))
+        self.assertEqual(None, datum_to_iso("01/31/2020"))
+        self.assertEqual(None, datum_to_iso("a"))
 
-    def test_datum_iso_to_deutsches_format(self):
-        self.fail()
 
-    def test_setze_abrechnungsdatum(self):
-        self.fail()
+    def test_datum_to_deutsches_format(self):
+        datum_iso = "2020-01-31"
+        datum_dt = "31.01.2020"
+        self.assertEqual(datum_dt, datum_to_deutsches_format(datum_dt))
+        self.assertEqual(datum_dt, datum_to_deutsches_format(datum_iso))
+        self.assertEqual(None, datum_to_deutsches_format("01/31/2020"))
+        self.assertEqual(None, datum_to_deutsches_format("a"))
+
 
     def test_rechnung_pdf_speichern(self):
         self.fail()
 
-    def test_rechnung_anzeigen(self):
-        self.fail()

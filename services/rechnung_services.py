@@ -14,12 +14,14 @@ from utils.paths import DB_PATH
 
 
 def neue_rechnung_erfassen(person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: str,
-                           verwendungszweck: str, db_path: str = DB_PATH):
-    try:
+                           verwendungszweck: str, db_path: str = DB_PATH)->(bool,str):
+    if ist_gueltiger_betrag(betrag):
         betrag = float(betrag.replace(",", "."))
-    except ValueError:
+    else:
         return False, "Ungültiger Betrag."
     rechnungsdatum_iso = datum_to_iso(rechnungsdatum)
+    if not rechnungsdatum_iso:
+        return False, "Ungültiges Datumsformat."
     rechnungDTO = read_rechnung(db_path,person_id, rechnungssteller_id, rechnungsdatum_iso, betrag, verwendungszweck)
     if rechnungDTO:
         return False, "Rechnung existiert bereits."
@@ -71,30 +73,36 @@ def alle_offenen_rechnungen_von_person(person_id: int, db_path: str = DB_PATH):
         return None, "Keine offenen Rechnungen vorhanden."
     return rechnungen, "Rechnungen erfolgreich geladen."
 
+def datum_to_iso(datum_str: str) -> str | None:
+    for fmt in ("%Y-%m-%d", "%d.%m.%Y"):
+        try:
+            dt = datetime.strptime(datum_str, fmt)
+            return dt.strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
 
-def ist_gueltiges_datum(datum_str: str) -> bool:
-    try:
-        datetime.strptime(datum_str, "%d.%m.%Y")
-        return True
-    except ValueError:
-        return False
-
-
-def datum_to_iso(datum_str: str) -> str:
-    return datetime.strptime(datum_str, "%d.%m.%Y").strftime("%Y-%m-%d")
-
-
-def datum_iso_to_deutsches_format(datum_iso: str) -> str:
-    return datetime.strptime(datum_iso, "%Y-%m-%d").strftime("%d.%m.%Y")
-
+def datum_to_deutsches_format(datum_str: str) -> str | None:
+    for fmt in ("%Y-%m-%d", "%d.%m.%Y"):
+        try:
+            dt = datetime.strptime(datum_str, fmt)
+            return dt.strftime("%d.%m.%Y")
+        except ValueError:
+            continue
+    return None
 
 def setze_abrechnungsdatum(rechnungen: list[RechnungDTO], abrechnungsdatum: str, db_path: str = DB_PATH) -> (bool, str):
+    """
+    Abrechnungsdatum wird durch Abrechnungs_ID ersetzt. Neue Tabelle (ID, Datum, Gesamt_Betrag, Beihilfe_Betrag, PKV_Betrag) für Abrechnungen vorgesehen.
+    """
+
     if rechnungen is None:
         return False, "Keine Rechnungen ausgewählt."
-    if not ist_gueltiges_datum(abrechnungsdatum):
+    datum = datum_to_iso(abrechnungsdatum)
+    if not datum:
         return False, "Abrechnungsdatum ungültig."
     for re in rechnungen:
-        update_abrechnungsdatum(db_path, re.id, datum_to_iso(abrechnungsdatum))
+        update_abrechnungsdatum(db_path, re.id, datum)
     return True, "Abrechnungsdatum erfolgreich gesetzt."
 
 
@@ -105,6 +113,3 @@ def rechnung_pdf_speichern(rechnung_id: int, db_path: str = DB_PATH):
     update_pdf_path(db_path, rechnung_id, hashwert)
     return True, "Datei hochgeladen."
 
-
-def rechnung_anzeigen(pdf_path: str):
-    pdf_oeffnen_und_anzeigen(pdf_path)

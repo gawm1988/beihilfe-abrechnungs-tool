@@ -1,0 +1,73 @@
+{
+  "personen": [
+    {
+      "vorname": "Anton",
+      "nachname": "Anlagenbauer",
+      "beihilfesatz": "0,8"
+    },
+    {
+      "vorname": "Berta",
+      "nachname": "Bildhauerin",
+      "beihilfesatz": "0,75"
+    },
+    {
+      "vorname": "Christian",
+      "nachname": "Chemikermeister",
+      "beihilfesatz": "0,55"
+    },
+    {
+      "vorname": "Dora",
+      "nachname": "Dachdeckerin",
+      "beihilfesatz": "0.35"
+    }
+  ],
+  "rechnungssteller": [
+    {
+      "name": "Alte Apotheke",
+      "iban": ""
+    },
+    {
+      "name": "Betriebsärztin B. Berger",
+      "iban": "DE02120300000000202051"
+    },
+    {
+      "name": "Chirurgie Carstensen",
+      "iban": "DE02500105170137075030"
+    },
+    {
+      "name": "Dentist D. Dahlmann",
+      "iban": "DE02100500000054540402"
+    }
+  ],
+  "rechnungen": [
+    { "person_id": 1, "rechnungssteller_id": 1, "rechnungsdatum": "2025-01-05", "betrag": "24.90", "verwendungszweck": "Medikamente Erkältung" },
+    { "person_id": 1, "rechnungssteller_id": 2, "rechnungsdatum": "2025-01-12", "betrag": "89.50", "verwendungszweck": "Vorsorgeuntersuchung" },
+    { "person_id": 1, "rechnungssteller_id": 3, "rechnungsdatum": "2025-02-03", "betrag": "320.00", "verwendungszweck": "Ambulante Operation" },
+    { "person_id": 1, "rechnungssteller_id": 4, "rechnungsdatum": "2025-02-18", "betrag": "145.75", "verwendungszweck": "Zahnreinigung" },
+
+    { "person_id": 2, "rechnungssteller_id": 1, "rechnungsdatum": "2025-01-08", "betrag": "15.30", "verwendungszweck": "Rezeptgebühr" },
+    { "person_id": 2, "rechnungssteller_id": 2, "rechnungsdatum": "2025-01-20", "betrag": "110.00", "verwendungszweck": "Allgemeine Untersuchung" },
+    { "person_id": 2, "rechnungssteller_id": 3, "rechnungsdatum": "2025-03-02", "betrag": "540.40", "verwendungszweck": "Chirurgischer Eingriff" },
+    { "person_id": 2, "rechnungssteller_id": 4, "rechnungsdatum": "2025-03-15", "betrag": "210.99", "verwendungszweck": "Zahnfüllung" },
+
+    { "person_id": 3, "rechnungssteller_id": 1, "rechnungsdatum": "2025-01-11", "betrag": "32.80", "verwendungszweck": "Schmerzmittel" },
+    { "person_id": 3, "rechnungssteller_id": 2, "rechnungsdatum": "2025-02-01", "betrag": "75.00", "verwendungszweck": "Blutuntersuchung" },
+    { "person_id": 3, "rechnungssteller_id": 3, "rechnungsdatum": "2025-02-20", "betrag": "410.60", "verwendungszweck": "Ambulante Behandlung" },
+    { "person_id": 3, "rechnungssteller_id": 4, "rechnungsdatum": "2025-03-22", "betrag": "98.45", "verwendungszweck": "Kontrolluntersuchung Zahnarzt" },
+
+    { "person_id": 4, "rechnungssteller_id": 1, "rechnungsdatum": "2025-01-14", "betrag": "18.60", "verwendungszweck": "Antibiotika" },
+    { "person_id": 4, "rechnungssteller_id": 2, "rechnungsdatum": "2025-02-10", "betrag": "130.20", "verwendungszweck": "Impfung" },
+    { "person_id": 4, "rechnungssteller_id": 3, "rechnungsdatum": "2025-03-05", "betrag": "670.00", "verwendungszweck": "Chirurgische Nachbehandlung" },
+    { "person_id": 4, "rechnungssteller_id": 4, "rechnungsdatum": "2025-03-28", "betrag": "175.35", "verwendungszweck": "Zahnextraktion" },
+
+    { "person_id": 1, "rechnungssteller_id": 2, "rechnungsdatum": "2025-04-04", "betrag": "95.00", "verwendungszweck": "Check-up Untersuchung" },
+    { "person_id": 2, "rechnungssteller_id": 1, "rechnungsdatum": "2025-04-09", "betrag": "22.45", "verwendungszweck": "Medikamente Allergie" },
+    { "person_id": 3, "rechnungssteller_id": 4, "rechnungsdatum": "2025-04-15", "betrag": "260.00", "verwendungszweck": "Zahnersatz Teilzahlung" },
+    { "person_id": 4, "rechnungssteller_id": 3, "rechnungsdatum": "2025-04-22", "betrag": "380.75", "verwendungszweck": "Ambulante OP Voruntersuchung" },
+
+    { "person_id": 1, "rechnungssteller_id": 4, "rechnungsdatum": "2025-05-03", "betrag": "120.00", "verwendungszweck": "Paradontose Behandlung" },
+    { "person_id": 2, "rechnungssteller_id": 3, "rechnungsdatum": "2025-05-10", "betrag": "455.50", "verwendungszweck": "Chirurgische Kontrolle" },
+    { "person_id": 3, "rechnungssteller_id": 2, "rechnungsdatum": "2025-05-18", "betrag": "88.90", "verwendungszweck": "Internistische Untersuchung" },
+    { "person_id": 4, "rechnungssteller_id": 1, "rechnungsdatum": "2025-05-25", "betrag": "27.99", "verwendungszweck": "Vitaminpräparate" }
+  ]
+}
