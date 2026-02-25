@@ -1,14 +1,11 @@
 import sqlite3
-import os
 
-from utils.paths import DB_PATH
-
-def connect():
-    return sqlite3.connect(DB_PATH)
+def connect(db_path:str):
+    return sqlite3.connect(db_path)
 
 
-def create_tabellen():
-    with connect() as conn:
+def create_tabellen(db_path:str):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS person (
@@ -33,7 +30,7 @@ def create_tabellen():
                 rechnungsdatum DATE NOT NULL,
                 betrag REAL NOT NULL,
                 verwendungszweck TEXT NOT NULL,
-                pdf_path TEXT,
+                hashwert TEXT,
                 abrechnungsdatum DATE
             )
         """)

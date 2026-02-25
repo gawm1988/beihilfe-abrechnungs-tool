@@ -6,9 +6,10 @@ import ttkbootstrap as ttk
 from PIL import ImageTk
 from ttkbootstrap.constants import *
 
-from datenbank.person import read_all_personen
 from services.rechnung_services import *
-from services.rechnungssteller_services import lade_alle_rechnungssteller, lade_iban
+from services.person_services import lade_alle_personen_dict
+from services.rechnungssteller_services import lade_alle_rechnungssteller_dict, lade_iban
+from services.dokumenten_services import pdf_laden_und_speichern, pdf_oeffnen_und_anzeigen
 
 
 def setup(master) -> ttk.Frame:
@@ -17,11 +18,7 @@ def setup(master) -> ttk.Frame:
     frame.columnconfigure(1, weight=1)
     frame.rowconfigure(4, weight=1)
 
-    personen = read_all_personen()
-    personen_dict = {
-        f"{vorname} {nachname}": pid
-        for pid, vorname, nachname in personen
-    }
+    personen_dict = lade_alle_personen_dict()
 
     ttk.Label(frame, text="Person").grid(row=0, column=0, sticky=W, padx=5, pady=8)
 
@@ -82,7 +79,7 @@ def setup(master) -> ttk.Frame:
         for widget in rechnungen_frame.winfo_children():
             widget.destroy()
 
-        rechnungssteller_dict = lade_alle_rechnungssteller()
+        rechnungssteller_dict = lade_alle_rechnungssteller_dict()
 
         rechnungen, message = alle_offenen_rechnungen_von_person(person_id)
         if rechnungen is None:
@@ -91,7 +88,7 @@ def setup(master) -> ttk.Frame:
 
         for index, r in enumerate(rechnungen):
             rechnungssteller_name = rechnungssteller_dict.get(r.rechnungssteller_id)
-            rechnungsdatum = datum_iso_to_aneige(r.rechnungsdatum)
+            rechnungsdatum = datum_to_deutsches_format(r.rechnungsdatum)
             betrag = r.betrag
             verwendungszweck = r.verwendungszweck
 
@@ -119,7 +116,8 @@ def setup(master) -> ttk.Frame:
             button_frame.pack(anchor="e", pady=5)
 
             def upload_pdf(rechnung_id):
-                rechnung_pdf_speichern(rechnung_id)
+                hashwert = pdf_laden_und_speichern()
+                rechnung_hashwert_speichern(rechnung_id, hashwert)
                 on_person_select(None)
 
             def lade_qr_code(rechnungsteller_name, betrag, verwendungszweck):

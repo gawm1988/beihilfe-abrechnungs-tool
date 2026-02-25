@@ -1,5 +1,5 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Spezialfall für PyInstaller
 if getattr(sys, 'frozen', False):
@@ -14,3 +14,5 @@ DB_PATH = DATA_DIR / "beihilfe.db"
 # Ordner automatisch anlegen
 PDF_DIR.mkdir(parents=True, exist_ok=True)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+TEST_RESOURCES_DIR = BASE_DIR / "tests/resources/testdaten.json"

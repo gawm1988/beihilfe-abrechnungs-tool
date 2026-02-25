@@ -1,46 +1,54 @@
 from .connection import connect
 
+
 class RechnungDTO:
     id: int
-    person_id:int
+    person_id: int
     rechnungssteller_id: int
     rechnungsdatum: str
     betrag: str
     verwendungszweck: str
     abrechnungsdatum: str
-    pdf_path: str
+    hashwert: str
 
-
-    def __init__(self, id:int, person_id:int, rechnungsteller_id:int, rechnungsdatum:str, betrag:str, verwendungszweck:str, pdf_path:str):
+    def __init__(self, id: int, person_id: int, rechnungsteller_id: int, rechnungsdatum: str, betrag: str,
+                 verwendungszweck: str, hashwert: str):
         self.id = id
         self.person_id = person_id
         self.rechnungssteller_id = rechnungsteller_id
         self.rechnungsdatum = rechnungsdatum
         self.betrag = betrag
         self.verwendungszweck = verwendungszweck
-        self.pdf_path = pdf_path
+        self.hashwert = hashwert
 
     def __str__(self):
         return f"{self.person_id} → {self.rechnungssteller_id}:\n€ {self.betrag}\nVWZ: {self.verwendungszweck}\nvom {self.rechnungsdatum}\n"
 
-def create_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str) -> bool:
-    with connect() as conn:
+
+def create_rechnung(db_path:str, person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str,
+                    ) -> bool:
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO rechnung (person_id,rechnungssteller_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?)",
             (person_id, rechnungssteller_id, rechnungsdatum, betrag, verwendungszweck)
         )
 
-def read_rechnung(person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str):
-    with connect() as conn:
+
+def read_rechnung(db_path:str, person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str,
+                  ):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
-        fetch = cursor.execute("SELECT * FROM rechnung WHERE person_id=? AND rechnungssteller_id=? AND rechnungsdatum=? AND betrag=? AND verwendungszweck=?", (person_id,rechnungssteller_id,rechnungsdatum,betrag,verwendungszweck)).fetchone()
+        fetch = cursor.execute(
+            "SELECT * FROM rechnung WHERE person_id=? AND rechnungssteller_id=? AND rechnungsdatum=? AND betrag=? AND verwendungszweck=?",
+            (person_id, rechnungssteller_id, rechnungsdatum, betrag, verwendungszweck)).fetchone()
         if fetch is None:
             return None
         return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
 
-def read_rechnung_by_id(rechnung_id: int):
-    with connect() as conn:
+
+def read_rechnung_by_id(db_path:str, rechnung_id: int):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute(
             "SELECT * FROM rechnung WHERE id=?",
@@ -49,8 +57,9 @@ def read_rechnung_by_id(rechnung_id: int):
             return None
         return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
 
-def read_offene_rechnungen_von_person_id(person_id: int):
-    with connect() as conn:
+
+def read_offene_rechnungen_von_person_id(db_path:str, person_id: int):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         rechnungen = []
         fetch = cursor.execute(
@@ -63,18 +72,41 @@ def read_offene_rechnungen_von_person_id(person_id: int):
             rechnungen.append(RechnungDTO(f[0], f[1], f[2], f[3], f[4], f[5], f[6]))
         return rechnungen
 
-def update_abrechnungsdatum(rechnung_id: int, abrechnungsdatum:str):
-    with connect() as conn:
+
+def update_abrechnungsdatum(db_path:str, rechnung_id: int, abrechnungsdatum: str):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE rechnung SET abrechnungsdatum=? WHERE id=?",
-            (abrechnungsdatum,rechnung_id)
+            (abrechnungsdatum, rechnung_id)
         )
 
-def update_pdf_path(rechnung_id:int, pdf_path:str):
-    with connect() as conn:
+
+def update_hashwert(db_path:str, rechnung_id: int, hashwert: str):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE rechnung SET pdf_path=? WHERE id=?",
-            (pdf_path,rechnung_id)
+            "UPDATE rechnung SET hashwert=? WHERE id=?",
+            (hashwert, rechnung_id)
         )
+
+def read_rechnung_by_id_person_rechnungssteller(db_path:str, person_id:int, rechnungssteller_id:int, rechnungsdatum:str):
+    with connect(db_path) as conn:
+        cursor = conn.cursor()
+        fetch = cursor.execute(
+            "SELECT * FROM rechnung WHERE person_id=? AND rechnungssteller_id=? AND rechnungsdatum=?",(person_id, rechnungssteller_id,rechnungsdatum)
+        ).fetchone()
+        if fetch is None:
+            return None
+        return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
+    
+def read_rechnung_by_hashwert(db_path:str, hashwert:str):
+    with connect(db_path) as conn:
+        cursor = conn.cursor()
+        fetch = cursor.execute(
+            "SELECT * FROM rechnung WHERE hashwert=?",
+            (hashwert,)
+        ).fetchone()
+        if fetch is None:
+            return None
+        return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])

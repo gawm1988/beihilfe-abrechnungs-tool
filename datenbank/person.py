@@ -1,12 +1,13 @@
 from .connection import connect
 
-class PersonDTO:
-    id:int
-    vorname:str
-    nachname:str
-    beihilfesatz:float
 
-    def __init__(self, id:int, vorname:str, nachname:str, beihilfesatz:float):
+class PersonDTO:
+    id: int
+    vorname: str
+    nachname: str
+    beihilfesatz: float
+
+    def __init__(self, id: int, vorname: str, nachname: str, beihilfesatz: float):
         self.id = id
         self.vorname = vorname
         self.nachname = nachname
@@ -16,28 +17,38 @@ class PersonDTO:
         return f"{self.vorname} {self.nachname}"
 
 
-def create_person(vorname: str, nachname: str, beihilfesatz: float = 0.0):
-    with connect() as conn:
+def create_person(db_path: str, vorname: str, nachname: str, beihilfesatz: float = 0.0):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO person (vorname,nachname,beihilfesatz) VALUES (?,?,?)",(vorname, nachname, beihilfesatz))
+        cursor.execute("INSERT INTO person (vorname,nachname,beihilfesatz) VALUES (?,?,?)",
+                       (vorname, nachname, beihilfesatz))
 
-def read_person_by_name(vorname: str, nachname: str):
-    with connect() as conn:
+
+def read_person_by_name(db_path: str, vorname: str, nachname: str):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
-        fetch = cursor.execute("SELECT * FROM person WHERE vorname=? AND nachname=?",(vorname, nachname)).fetchone()
+        fetch = cursor.execute("SELECT * FROM person WHERE vorname=? AND nachname=?", (vorname, nachname)).fetchone()
         if fetch is None:
             return None
         return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])
 
-def read_person_by_id(person_id: int):
-    with connect() as conn:
+
+def read_person_by_id(db_path: str, person_id: int):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
-        fetch = cursor.execute("SELECT * FROM person WHERE id=?",(person_id,)).fetchone()
+        fetch = cursor.execute("SELECT * FROM person WHERE id=?", (person_id,)).fetchone()
         if fetch is None:
             return None
         return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])
 
-def read_all_personen():
-    with connect() as conn:
+
+def read_all_personen(db_path: str):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
-        return cursor.execute("SELECT id, vorname, nachname FROM person").fetchall()
+        personen = cursor.execute("SELECT * FROM person").fetchall()
+        if not personen:
+            return None
+        personenDTO_list = []
+        for p in personen:
+            personenDTO_list.append(PersonDTO(p[0], p[1], p[2], p[3]))
+        return personenDTO_list

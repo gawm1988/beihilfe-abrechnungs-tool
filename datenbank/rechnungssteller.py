@@ -1,11 +1,12 @@
 from .connection import connect
 
+
 class RechnungstellerDTO:
     id: int
     name: str
     iban: str
 
-    def __init__(self,id:int, name:str, iban:str):
+    def __init__(self, id: int, name: str, iban: str):
         self.id = id
         self.name = name
         self.iban = iban
@@ -14,38 +15,41 @@ class RechnungstellerDTO:
         return f"{self.name}"
 
 
-def create_rechnungssteller(name: str, iban: str):
-    with connect() as conn:
+def create_rechnungssteller(db_path:str, name: str, iban: str):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("INSERT INTO rechnungssteller (name,iban) VALUES (?,?)", (name, iban))
 
-def read_rechnungssteller_by_name(name: str)->RechnungstellerDTO:
-    with connect() as conn:
+
+def read_rechnungssteller_by_name(db_path:str, name: str) -> RechnungstellerDTO:
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE name=?", (name,)).fetchone()
         if fetch is None:
             return None
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
-def read_rechnungssteller_by_id(rechnungsteller_id: int)->RechnungstellerDTO:
-    with connect() as conn:
+
+def read_rechnungssteller_by_id(db_path:str, rechnungsteller_id: int) -> RechnungstellerDTO:
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute("SELECT * FROM rechnungssteller WHERE id=?", (rechnungsteller_id,)).fetchone()
         if fetch is None:
             return None
         return RechnungstellerDTO(fetch[0], fetch[1], fetch[2])
 
-def read_alle_rechnungssteller_mit_iban():
-    with connect() as conn:
+def read_alle_rechnungssteller(db_path):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
-        return cursor.execute("SELECT name, iban FROM rechnungssteller").fetchall()
+        rechnungssteller = cursor.execute("SELECT * FROM rechnungssteller").fetchall()
+        if not rechnungssteller:
+            return None
+        rechnungstellerDTO_list = []
+        for r in rechnungssteller:
+            rechnungstellerDTO_list.append(RechnungstellerDTO(r[0], r[1], r[2]))
+        return rechnungstellerDTO_list
 
-def read_alle_rechnungssteller():
-    with connect() as conn:
-        cursor = conn.cursor()
-        return cursor.execute("SELECT id, name FROM rechnungssteller").fetchall()
-
-def update_iban(name: str, iban: str):
-    with connect() as conn:
+def update_iban(db_path:str, name: str, iban: str):
+    with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("UPDATE rechnungssteller SET iban = ? WHERE name = ?", (iban, name))
