@@ -8,11 +8,11 @@ class RechnungDTO:
     rechnungsdatum: str
     betrag: str
     verwendungszweck: str
-    abrechnungsdatum: str
     hashwert: str
+    abrechnung_id: int
 
     def __init__(self, id: int, person_id: int, rechnungsteller_id: int, rechnungsdatum: str, betrag: str,
-                 verwendungszweck: str, hashwert: str):
+                 verwendungszweck: str, hashwert: str, abrechnung_id:int):
         self.id = id
         self.person_id = person_id
         self.rechnungssteller_id = rechnungsteller_id
@@ -20,6 +20,7 @@ class RechnungDTO:
         self.betrag = betrag
         self.verwendungszweck = verwendungszweck
         self.hashwert = hashwert
+        self.abrechnung_id = abrechnung_id
 
     def __str__(self):
         return f"{self.person_id} → {self.rechnungssteller_id}:\n€ {self.betrag}\nVWZ: {self.verwendungszweck}\nvom {self.rechnungsdatum}\n"
@@ -44,6 +45,7 @@ def read_rechnung(db_path:str, person_id: int, rechnungssteller_id: int, rechnun
             (person_id, rechnungssteller_id, rechnungsdatum, betrag, verwendungszweck)).fetchone()
         if fetch is None:
             return None
+        print(*fetch)
         return RechnungDTO(*fetch)
 
 
@@ -63,7 +65,7 @@ def read_offene_rechnungen_von_person_id(db_path:str, person_id: int):
         cursor = conn.cursor()
         rechnungen = []
         fetch = cursor.execute(
-            "SELECT * FROM rechnung WHERE person_id=? AND abrechnungsdatum IS NULL",
+            "SELECT * FROM rechnung WHERE person_id=? AND abrechnung_id IS NULL",
             (person_id,)
         ).fetchall()
         if fetch is None:

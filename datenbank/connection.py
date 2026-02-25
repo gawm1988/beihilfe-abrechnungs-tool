@@ -31,7 +31,7 @@ def create_tabellen(db_path:str):
                 betrag REAL NOT NULL,
                 verwendungszweck TEXT NOT NULL,
                 hashwert TEXT,
-                abrechnungs_id INTEGER
+                abrechnung_id INTEGER
             )
         """)
 
