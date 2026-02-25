@@ -7,9 +7,7 @@ from PIL import Image
 
 from datenbank.person import read_person_by_id
 from datenbank.rechnung import *
-from datenbank.rechnung import RechnungDTO
 from datenbank.rechnungssteller import read_rechnungssteller_by_name
-from services.dokumenten_services import *
 from utils.paths import DB_PATH
 
 
@@ -109,10 +107,15 @@ def setze_abrechnungsdatum(rechnungen: list[RechnungDTO], abrechnungsdatum: str,
     return True, "Abrechnungsdatum erfolgreich gesetzt."
 
 
-def rechnung_pdf_speichern(rechnung_id: int, db_path: str = DB_PATH):
-    hashwert = pdf_laden_und_speichern()
+def rechnungspfad_speichern(rechnung_id: int, hashwert:str, db_path: str = DB_PATH):
     if not hashwert:
         return False, "Upload nicht erfolgreich."
     update_pdf_path(db_path, rechnung_id, hashwert)
     return True, "Datei hochgeladen."
 
+def lade_rechnung_by_person_rechnungssteller_datum(person_id:int,rechnungssteller_id:int, rechnungsdatum:str, db_path: str = DB_PATH):
+    datum = datum_to_iso(rechnungsdatum)
+    rechnungDTO = read_rechnung_by_id_person_rechnungssteller(db_path,person_id,rechnungssteller_id,datum)
+    if not rechnungDTO:
+        return None
+    return rechnungDTO

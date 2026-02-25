@@ -1,6 +1,8 @@
 import json
 import tempfile
+import os
 from unittest import TestCase
+
 
 from datenbank.connection import create_tabellen
 from services.person_services import neue_person_erfassen, lade_person_by_name
@@ -153,3 +155,34 @@ class Rechnung_Test(TestCase):
         self.assertEqual(None, datum_to_deutsches_format("01/31/2020"))
         self.assertEqual(None, datum_to_deutsches_format("a"))
 
+    def test_rechnungspfad_speichern(self):
+        neue_person_erfassen("Theodor", "Testperson", "0.85", self.db_path)
+        personDTO = lade_person_by_name("Theodor", "Testperson", self.db_path)
+        neuen_rechnungsteller_erfassen("Testfirma", "", self.db_path)
+        rechnungsstellerDTO = lade_rechnungssteller_by_name("Testfirma", self.db_path)
+        rechnungsdatum = "31.01.2020"
+        neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, rechnungsdatum, "12,34",
+                                                   "Test-Rechnung", self.db_path)
+        rechnungDTO = lade_rechnung_by_person_rechnungssteller_datum(personDTO.id, rechnungsstellerDTO.id, rechnungsdatum,self.db_path)
+        hashwert = "0123456789abcdef"
+        rechnungspfad_speichern(rechnungDTO.id,hashwert,self.db_path)
+        rechnungDTO = lade_rechnung_by_person_rechnungssteller_datum(personDTO.id, rechnungsstellerDTO.id,
+                                                                     rechnungsdatum, self.db_path)
+        self.assertEqual(rechnungDTO.pdf_path,hashwert)
+
+    def test_lade_rechnung_by_person_rechnungssteller_datum(self):
+        neue_person_erfassen("Theodor", "Testperson", "0.85", self.db_path)
+        personDTO = lade_person_by_name("Theodor", "Testperson", self.db_path)
+        neuen_rechnungsteller_erfassen("Testfirma", "", self.db_path)
+        rechnungsstellerDTO = lade_rechnungssteller_by_name("Testfirma", self.db_path)
+        rechnungsdatum = "31.01.2020"
+        neue_rechnung_erfassen(personDTO.id, rechnungsstellerDTO.id, rechnungsdatum, "12,34",
+                               "Test-Rechnung", self.db_path)
+        rechnungDTO = lade_rechnung_by_person_rechnungssteller_datum(personDTO.id, rechnungsstellerDTO.id,
+                                                                     rechnungsdatum, self.db_path)
+        self.assertEqual(rechnungDTO.person_id,personDTO.id)
+        self.assertEqual(rechnungDTO.rechnungssteller_id, rechnungsstellerDTO.id)
+        self.assertEqual(rechnungDTO.rechnungsdatum, datum_to_iso(rechnungsdatum))
+        rechnungDTO = lade_rechnung_by_person_rechnungssteller_datum(personDTO.id, rechnungsstellerDTO.id,
+                                                                     "01.12.1999", self.db_path)
+        self.assertEqual(None, rechnungDTO)

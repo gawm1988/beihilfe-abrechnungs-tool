@@ -9,6 +9,7 @@ from ttkbootstrap.constants import *
 from services.rechnung_services import *
 from services.person_services import lade_alle_personen_dict
 from services.rechnungssteller_services import lade_alle_rechnungssteller_dict, lade_iban
+from services.dokumenten_services import pdf_laden_und_speichern, pdf_oeffnen_und_anzeigen
 
 
 def setup(master) -> ttk.Frame:
@@ -115,7 +116,8 @@ def setup(master) -> ttk.Frame:
             button_frame.pack(anchor="e", pady=5)
 
             def upload_pdf(rechnung_id):
-                rechnung_pdf_speichern(rechnung_id)
+                hashwert = pdf_laden_und_speichern()
+                rechnungspfad_speichern(rechnung_id, hashwert)
                 on_person_select(None)
 
             def lade_qr_code(rechnungsteller_name, betrag, verwendungszweck):

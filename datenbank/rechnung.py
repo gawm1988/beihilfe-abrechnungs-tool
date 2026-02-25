@@ -89,3 +89,13 @@ def update_pdf_path(db_path:str, rechnung_id: int, pdf_path: str):
             "UPDATE rechnung SET pdf_path=? WHERE id=?",
             (pdf_path, rechnung_id)
         )
+
+def read_rechnung_by_id_person_rechnungssteller(db_path:str, person_id:int, rechnungssteller_id:int, rechnungsdatum:str):
+    with connect(db_path) as conn:
+        cursor = conn.cursor()
+        fetch = cursor.execute(
+            "SELECT * FROM rechnung WHERE person_id=? AND rechnungssteller_id=? AND rechnungsdatum=?",(person_id, rechnungssteller_id,rechnungsdatum)
+        ).fetchone()
+        if fetch is None:
+            return None
+        return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
