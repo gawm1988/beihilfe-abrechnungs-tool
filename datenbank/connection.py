@@ -31,6 +31,17 @@ def create_tabellen(db_path:str):
                 betrag REAL NOT NULL,
                 verwendungszweck TEXT NOT NULL,
                 hashwert TEXT,
-                abrechnungsdatum DATE
+                abrechnungs_id INTEGER
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS abrechnung (
+                id INTEGER PRIMARY KEY,
+                abrechnungsdatum DATE NOT NULL,
+                gesamtbetrag REAL NOT NULL,
+                beihilfebetrag REAL,
+                pkv_betrag REAL,
+                hashwert TEXT                
             )
         """)

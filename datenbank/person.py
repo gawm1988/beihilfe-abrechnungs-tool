@@ -30,7 +30,7 @@ def read_person_by_name(db_path: str, vorname: str, nachname: str):
         fetch = cursor.execute("SELECT * FROM person WHERE vorname=? AND nachname=?", (vorname, nachname)).fetchone()
         if fetch is None:
             return None
-        return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])
+        return PersonDTO(*fetch)
 
 
 def read_person_by_id(db_path: str, person_id: int):
@@ -39,7 +39,7 @@ def read_person_by_id(db_path: str, person_id: int):
         fetch = cursor.execute("SELECT * FROM person WHERE id=?", (person_id,)).fetchone()
         if fetch is None:
             return None
-        return PersonDTO(fetch[0], fetch[1], fetch[2], fetch[3])
+        return PersonDTO(*fetch)
 
 
 def read_all_personen(db_path: str):
@@ -50,5 +50,5 @@ def read_all_personen(db_path: str):
             return None
         personenDTO_list = []
         for p in personen:
-            personenDTO_list.append(PersonDTO(p[0], p[1], p[2], p[3]))
+            personenDTO_list.append(PersonDTO(*p))
         return personenDTO_list

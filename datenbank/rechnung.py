@@ -44,7 +44,7 @@ def read_rechnung(db_path:str, person_id: int, rechnungssteller_id: int, rechnun
             (person_id, rechnungssteller_id, rechnungsdatum, betrag, verwendungszweck)).fetchone()
         if fetch is None:
             return None
-        return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
+        return RechnungDTO(*fetch)
 
 
 def read_rechnung_by_id(db_path:str, rechnung_id: int):
@@ -55,7 +55,7 @@ def read_rechnung_by_id(db_path:str, rechnung_id: int):
             (rechnung_id,)).fetchone()
         if fetch is None:
             return None
-        return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
+        return RechnungDTO(*fetch)
 
 
 def read_offene_rechnungen_von_person_id(db_path:str, person_id: int):
@@ -69,7 +69,7 @@ def read_offene_rechnungen_von_person_id(db_path:str, person_id: int):
         if fetch is None:
             return None
         for f in fetch:
-            rechnungen.append(RechnungDTO(f[0], f[1], f[2], f[3], f[4], f[5], f[6]))
+            rechnungen.append(RechnungDTO(*f))
         return rechnungen
 
 
@@ -98,7 +98,7 @@ def read_rechnung_by_id_person_rechnungssteller(db_path:str, person_id:int, rech
         ).fetchone()
         if fetch is None:
             return None
-        return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
+        return RechnungDTO(*fetch)
     
 def read_rechnung_by_hashwert(db_path:str, hashwert:str):
     with connect(db_path) as conn:
@@ -109,4 +109,4 @@ def read_rechnung_by_hashwert(db_path:str, hashwert:str):
         ).fetchone()
         if fetch is None:
             return None
-        return RechnungDTO(fetch[0], fetch[1], fetch[2], fetch[3], fetch[4], fetch[5], fetch[6])
+        return RechnungDTO(*fetch)
