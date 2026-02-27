@@ -45,6 +45,13 @@ def setze_pkv_betrag(abrechnung_id:int, pkv_betrag:str, db_path: str = DB_PATH)-
     update_abrechnung_pkv_betrag(db_path, abrechnungDTO.id, float(pkv_betrag))
     return True, "PKV-Erstattung ergänzt."
 
+def lade_alle_abrechnungen_von_person_id(person_id:int, db_path: str = DB_PATH)->(list[AbrechnungDTO],str):
+    abrechnungenDTO_list = read_alle_abrechnungen_by_person_id(db_path, person_id)
+    if not abrechnungenDTO_list:
+        return None, "Keine Abrechnungen vorhanden."
+    return abrechnungenDTO_list, "Abrechnungen erfolgreich geladen."
+
+
 if __name__ == '__main__':
     testdaten_anlegen()
     print(erstelle_abrechnung(1,"2025-12-31"))

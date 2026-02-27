@@ -42,6 +42,19 @@ def read_abrechnung_by_id(db_path: str, abrechnung_id: int):
             return None
         return AbrechnungDTO(*fetch)
 
+def read_alle_abrechnungen_by_person_id(db_path:str, person_id:int):
+    with(connect(db_path)) as conn:
+        cursor = conn.cursor()
+        fetch = cursor.execute(
+            "SELECT * FROM abrechnung WHERE person_id = ? ",
+            (person_id,)
+        ).fetchall()
+        if not fetch:
+            return None
+        abrechnungen = []
+        for f in fetch:
+            abrechnungen.append(AbrechnungDTO(*f))
+        return abrechnungen
 
 def update_abrechnung_beihilfebetrag(db_path: str, abrechnung_id: str, beihilfebetrag: float):
     with(connect(db_path)) as conn:

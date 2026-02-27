@@ -5,6 +5,7 @@ import views.rechnungssteller_anlegen_view
 import views.rechnungssteller_aktualisieren_view
 import views.person_anlegen_view
 import views.offene_rechnungen_uebersicht_view
+import views.abrechnungen_uebersicht_view
 
 class App(ttk.Window):
     FONT = ("Segoe UI", 18)
@@ -57,6 +58,13 @@ class App(ttk.Window):
             command=self.show_offene_rechnungen_uebersicht
         ).pack(fill=X, pady=5)
 
+        ttk.Button(
+            self.sidebar,
+            text="Abrechnungen",
+            bootstyle="light",
+            command=self.show_abrechnungen_uebersicht
+        ).pack(fill=X, pady=5)
+
     # ----------------------------
     # Content Bereich
     # ----------------------------
@@ -95,6 +103,16 @@ class App(ttk.Window):
             row=0, column=0, sticky=W, padx=5, pady=5
         )
         frame = views.offene_rechnungen_uebersicht_view.setup(self.content)
+        frame.grid(row=1, column=0, sticky="nsew")
+        self.content.rowconfigure(1, weight=1)
+        self.content.columnconfigure(0, weight=1)
+
+    def show_abrechnungen_uebersicht(self):
+        self.clear_content()
+        ttk.Label(self.content, text="Abechnungen Übersicht", font=self.FONT).grid(
+            row=0, column=0, sticky=W, padx=5, pady=5
+        )
+        frame = views.abrechnungen_uebersicht_view.setup(self.content)
         frame.grid(row=1, column=0, sticky="nsew")
         self.content.rowconfigure(1, weight=1)
         self.content.columnconfigure(0, weight=1)
