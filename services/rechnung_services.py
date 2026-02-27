@@ -117,8 +117,3 @@ def setze_abrechnung_id(person_id:int, abrechnung_id:int, db_path: str = DB_PATH
         return False , message
     update_abrechnung_id(db_path, person_id, abrechnung_id)
     return True, f"Abrechnung_ID {abrechnung_id} erfolgreich gesetzt."
-
-if __name__ == '__main__':
-    id_gesetzt, msg = setze_abrechnung(2, 3, db_path=DB_PATH)
-    print(id_gesetzt)
-    print(msg)
