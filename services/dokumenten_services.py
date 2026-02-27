@@ -49,7 +49,8 @@ def pdf_dateien_zusammenfuehren(pdf_liste:list[str], rechnung_path = PDF_DIR)->s
     writer = PdfWriter()
 
     for pdf in pdf_liste:
-        reader = PdfReader(pdf)
+        path = f"{rechnung_path}/{pdf}"
+        reader = PdfReader(path)
         for page in reader.pages:
             writer.add_page(page)
 

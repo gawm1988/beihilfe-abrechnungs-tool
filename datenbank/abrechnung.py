@@ -23,9 +23,10 @@ def create_abrechnung(db_path: str, abrechnungsdatum: str, gesamtbetrag: float):
     with(connect(db_path)) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO abrechnung (abrechnungsdatum, gesamtbetrag) VALUES (?, ?)",
+            "INSERT INTO abrechnung (abrechnungsdatum, gesamtbetrag) VALUES (?, ?) RETURNING *",
             (abrechnungsdatum, gesamtbetrag)
         )
+        return AbrechnungDTO(*cursor.fetchone())
 
 
 def read_abrechnung_by_id(db_path: str, abrechnung_id: str):

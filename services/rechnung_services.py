@@ -92,21 +92,6 @@ def datum_to_deutsches_format(datum_str: str) -> str | None:
             continue
     return None
 
-def setze_abrechnungsdatum(rechnungen: list[RechnungDTO], abrechnungsdatum: str, db_path: str = DB_PATH) -> (bool, str):
-    """
-    Abrechnungsdatum wird durch Abrechnungs_ID ersetzt. Neue Tabelle (ID, Datum, Gesamt_Betrag, Beihilfe_Betrag, PKV_Betrag) für Abrechnungen vorgesehen.
-    """
-
-    if rechnungen is None:
-        return False, "Keine Rechnungen ausgewählt."
-    datum = datum_to_iso(abrechnungsdatum)
-    if not datum:
-        return False, "Abrechnungsdatum ungültig."
-    for re in rechnungen:
-        update_abrechnungsdatum(db_path, re.id, datum)
-    return True, "Abrechnungsdatum erfolgreich gesetzt."
-
-
 def rechnung_hashwert_speichern(rechnung_id: int, hashwert:str, db_path: str = DB_PATH):
     if not hashwert:
         return False, "Upload nicht erfolgreich."
@@ -122,3 +107,18 @@ def lade_rechnung_by_person_rechnungssteller_datum(person_id:int,rechnungsstelle
     if not rechnungDTO:
         return None
     return rechnungDTO
+
+def setze_abrechnung_id(person_id:int, abrechnung_id:int, db_path: str = DB_PATH):
+    rechnungen = read_rechnungen_by_abrechnung_id(db_path, abrechnung_id)
+    if rechnungen:
+        return False, "Abrechnung_ID existiert bereits."
+    rechnungen , message = alle_offenen_rechnungen_von_person(person_id, db_path)
+    if not rechnungen:
+        return False , message
+    update_abrechnung_id(db_path, person_id, abrechnung_id)
+    return True, f"Abrechnung_ID {abrechnung_id} erfolgreich gesetzt."
+
+if __name__ == '__main__':
+    id_gesetzt, msg = setze_abrechnung(2, 3, db_path=DB_PATH)
+    print(id_gesetzt)
+    print(msg)

@@ -75,13 +75,27 @@ def read_offene_rechnungen_von_person_id(db_path:str, person_id: int):
         return rechnungen
 
 
-def update_abrechnungsdatum(db_path:str, rechnung_id: int, abrechnungsdatum: str):
+def update_abrechnung_id(db_path:str, person_id: int, abrechnung_id: int):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE rechnung SET abrechnungsdatum=? WHERE id=?",
-            (abrechnungsdatum, rechnung_id)
+            "UPDATE rechnung SET abrechnung_id=? WHERE person_id=? AND abrechnung_id IS NULL",
+            (abrechnung_id, person_id)
         )
+
+def read_rechnungen_by_abrechnung_id(db_path:str, abrechnung_id: int):
+    with connect(db_path) as conn:
+        cursor = conn.cursor()
+        fetch = cursor.execute(
+            "SELECT * FROM rechnung WHERE abrechnung_id=?",
+            (abrechnung_id,)
+        ).fetchall()
+        if fetch is None:
+            return None
+        rechnungen = []
+        for f in fetch:
+            rechnungen.append(RechnungDTO(*f))
+        return rechnungen
 
 
 def update_hashwert(db_path:str, rechnung_id: int, hashwert: str):

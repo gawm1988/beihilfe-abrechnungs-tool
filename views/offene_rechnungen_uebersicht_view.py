@@ -95,6 +95,8 @@ def setup(master) -> ttk.Frame:
             row = index // 2
             col = index % 2
 
+            rechnungen_frame.rowconfigure(row, weight=1)
+
             card = ttk.Labelframe(
                 rechnungen_frame,
                 text=rechnungssteller_name,
@@ -135,13 +137,13 @@ def setup(master) -> ttk.Frame:
                     command=partial(lade_qr_code, rechnungssteller_name, betrag, verwendungszweck)
                 ).pack(side="left", padx=3)
 
-            if r.pdf_path:
+            if r.hashwert:
                 ttk.Button(
                     button_frame,
                     text="👁",
                     width=3,
                     bootstyle="secondary-outline",
-                    command=lambda p=r.pdf_path: pdf_oeffnen_und_anzeigen(p)
+                    command=lambda p=r.hashwert: pdf_oeffnen_und_anzeigen(p)
                 ).pack(side="left", padx=3)
 
             else:
