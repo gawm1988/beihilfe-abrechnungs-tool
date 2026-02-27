@@ -1,7 +1,8 @@
 from datenbank.abrechnung import *
 from datenbank.testdaten import testdaten_anlegen
 from services.dokumenten_services import pdf_dateien_zusammenfuehren
-from services.rechnung_services import alle_offenen_rechnungen_von_person, setze_abrechnung_id, ist_gueltiger_betrag
+from services.rechnung_services import alle_offenen_rechnungen_von_person, setze_abrechnung_id, ist_gueltiger_betrag, \
+    datum_to_iso
 from utils.paths import DB_PATH
 
 def erstelle_abrechnung(person_id:int, abrechnungsdatum:str, db_path: str = DB_PATH)->(bool, str):
@@ -15,6 +16,7 @@ def erstelle_abrechnung(person_id:int, abrechnungsdatum:str, db_path: str = DB_P
         if not re.hashwert:
             return False, "Nicht alle Dokumente hochgeladen."
         pdf_liste.append(f"{re.hashwert}.pdf")
+    abrechnungsdatum = datum_to_iso(abrechnungsdatum)
     abrechnungDTO = create_abrechnung(db_path,person_id,abrechnungsdatum, gesamtbetrag)
     ist_gesetzt, msg = setze_abrechnung_id(person_id, abrechnungDTO.id)
     if not ist_gesetzt:
@@ -23,7 +25,7 @@ def erstelle_abrechnung(person_id:int, abrechnungsdatum:str, db_path: str = DB_P
 
     hashwert = pdf_dateien_zusammenfuehren(pdf_liste)
     update_abrechnung_hashwert(db_path,abrechnungDTO.id, hashwert)
-    return "Neue Abrechnung angelegt"
+    return True, "Neue Abrechnung angelegt"
 
 def setze_beihilfebetrag(abrechnung_id:int, beihilfebetrag:str, db_path: str = DB_PATH)->(bool, str):
     abrechnungDTO = read_abrechnung_by_id(db_path, abrechnung_id)

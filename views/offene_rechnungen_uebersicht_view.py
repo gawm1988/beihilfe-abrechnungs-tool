@@ -1,11 +1,14 @@
 import tkinter as tk
 from functools import partial
 from tkinter import messagebox
+from tkinter.messagebox import showerror
 
 import ttkbootstrap as ttk
 from PIL import ImageTk
+from ttkbootstrap import DateEntry
 from ttkbootstrap.constants import *
 
+from services.abrechung_services import erstelle_abrechnung
 from services.rechnung_services import *
 from services.person_services import lade_alle_personen_dict
 from services.rechnungssteller_services import lade_alle_rechnungssteller_dict, lade_iban
@@ -164,6 +167,24 @@ def setup(master) -> ttk.Frame:
 
     qr_code_label = ttk.Label(frame)
     qr_code_label.grid(row=5, column=0, columnspan=2, pady=10)
+
+    entry_datum = DateEntry(frame, bootstyle="primary", dateformat="%d.%m.%Y")
+    entry_datum.grid(row=6, column=0, sticky=W, padx=5, pady=8)
+
+    def klick_abrechnung():
+        person = combo_person.get()
+        person_id = personen_dict.get(person)
+        abrechnungsdatum = entry_datum.entry.get()
+        ist_abgerechnet, message = erstelle_abrechnung(person_id,abrechnungsdatum)
+        if not ist_abgerechnet:
+            messagebox.showerror("Fehler", message)
+            return
+        messagebox.showinfo("✅ Erfolgreich abgerechnet", message)
+        on_person_select(None)
+
+
+    abrechnung_button = ttk.Button(frame, text="Abrechnung erstellen", command=klick_abrechnung)
+    abrechnung_button.grid(row=6, column=1,  sticky=EW,  pady=10)
 
     return frame
 
