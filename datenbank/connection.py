@@ -41,6 +41,7 @@ def create_tabellen(db_path:str):
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS abrechnung (
                 id INTEGER PRIMARY KEY,
+                person_id INTEGER NOT NULL,
                 abrechnungsdatum DATE NOT NULL,
                 gesamtbetrag REAL NOT NULL,
                 beihilfebetrag REAL,

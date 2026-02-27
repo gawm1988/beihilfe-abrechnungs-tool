@@ -65,7 +65,7 @@
     { "person_id": 3, "rechnungssteller_id": 4, "rechnungsdatum": "2025-04-15", "betrag": "260.00", "verwendungszweck": "Zahnersatz Teilzahlung" },
     { "person_id": 4, "rechnungssteller_id": 3, "rechnungsdatum": "2025-04-22", "betrag": "380.75", "verwendungszweck": "Ambulante OP Voruntersuchung" },
 
-    { "person_id": 1, "rechnungssteller_id": 4, "rechnungsdatum": "2025-05-03", "betrag": "120.00", "verwendungszweck": "Paradontose Behandlung" },
+    { "person_id": 2, "rechnungssteller_id": 4, "rechnungsdatum": "2025-05-03", "betrag": "120.00", "verwendungszweck": "Paradontose Behandlung" },
     { "person_id": 2, "rechnungssteller_id": 3, "rechnungsdatum": "2025-05-10", "betrag": "455.50", "verwendungszweck": "Chirurgische Kontrolle" },
     { "person_id": 3, "rechnungssteller_id": 2, "rechnungsdatum": "2025-05-18", "betrag": "88.90", "verwendungszweck": "Internistische Untersuchung" },
     { "person_id": 4, "rechnungssteller_id": 1, "rechnungsdatum": "2025-05-25", "betrag": "27.99", "verwendungszweck": "Vitaminpräparate" }

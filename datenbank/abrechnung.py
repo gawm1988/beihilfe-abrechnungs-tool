@@ -3,15 +3,17 @@ from datenbank.connection import connect
 
 class AbrechnungDTO:
     id: int
+    person_id:int
     abrechnungsdatum: str
     gesamtbetrag: float
     beihilfebetrag: float
     pkv_betrag: float
     hashwert: str
 
-    def __init__(self, id: int, abrechnungsdatum: str, gesamtbetrag: float, beihilfebetrag: float, pkv_betrag: float,
+    def __init__(self, id: int, person_id:int, abrechnungsdatum: str, gesamtbetrag: float, beihilfebetrag: float, pkv_betrag: float,
                  hashwert: str):
         self.id = id
+        self.person_id = person_id
         self.abrechnungsdatum = abrechnungsdatum
         self.gesamtbetrag = gesamtbetrag
         self.beihilfebetrag = beihilfebetrag
@@ -19,17 +21,17 @@ class AbrechnungDTO:
         self.hashwert = hashwert
 
 
-def create_abrechnung(db_path: str, abrechnungsdatum: str, gesamtbetrag: float):
+def create_abrechnung(db_path: str,person_id:int, abrechnungsdatum: str, gesamtbetrag: float):
     with(connect(db_path)) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO abrechnung (abrechnungsdatum, gesamtbetrag) VALUES (?, ?) RETURNING *",
-            (abrechnungsdatum, gesamtbetrag)
+            "INSERT INTO abrechnung (person_id, abrechnungsdatum, gesamtbetrag) VALUES (?,?, ?) RETURNING *",
+            (person_id,abrechnungsdatum, gesamtbetrag)
         )
         return AbrechnungDTO(*cursor.fetchone())
 
 
-def read_abrechnung_by_id(db_path: str, abrechnung_id: str):
+def read_abrechnung_by_id(db_path: str, abrechnung_id: int):
     with(connect(db_path)) as conn:
         cursor = conn.cursor()
         fetch = cursor.execute(
@@ -65,4 +67,12 @@ def update_abrechnung_hashwert(db_path: str, abrechnung_id: str, hashwert: str):
         cursor.execute(
             "UPDATE abrechnung SET hashwert = ? WHERE id = ?",
             (hashwert, abrechnung_id)
+        )
+
+def delete_abrechung(db_path: str, abrechnung_id: int):
+    with(connect(db_path)) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "DELETE FROM abrechnung WHERE id = ?",
+            (abrechnung_id,)
         )
