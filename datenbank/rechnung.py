@@ -31,9 +31,10 @@ def create_rechnung(db_path:str, person_id: int, rechnungssteller_id: int, rechn
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO rechnung (person_id,rechnungssteller_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?)",
+            "INSERT INTO rechnung (person_id,rechnungssteller_id,rechnungsdatum,betrag,verwendungszweck) VALUES (?,?,?,?,?) RETURNING *",
             (person_id, rechnungssteller_id, rechnungsdatum, betrag, verwendungszweck)
         )
+        return RechnungDTO(*cursor.fetchone())
 
 
 def read_rechnung(db_path:str, person_id: int, rechnungssteller_id: int, rechnungsdatum: str, betrag: float, verwendungszweck: str,
@@ -79,9 +80,10 @@ def update_abrechnung_id(db_path:str, person_id: int, abrechnung_id: int):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE rechnung SET abrechnung_id=? WHERE person_id=? AND abrechnung_id IS NULL",
+            "UPDATE rechnung SET abrechnung_id=? WHERE person_id=? AND abrechnung_id IS NULL RETURNING *",
             (abrechnung_id, person_id)
         )
+        return RechnungDTO(*cursor.fetchone())
 
 def read_rechnungen_by_abrechnung_id(db_path:str, abrechnung_id: int):
     with connect(db_path) as conn:
@@ -102,9 +104,10 @@ def update_hashwert(db_path:str, rechnung_id: int, hashwert: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE rechnung SET hashwert=? WHERE id=?",
+            "UPDATE rechnung SET hashwert=? WHERE id=? RETURNING *",
             (hashwert, rechnung_id)
         )
+        return RechnungDTO(*cursor.fetchone())
 
 def read_rechnung_by_id_person_rechnungssteller(db_path:str, person_id:int, rechnungssteller_id:int, rechnungsdatum:str):
     with connect(db_path) as conn:

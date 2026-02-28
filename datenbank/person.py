@@ -20,8 +20,9 @@ class PersonDTO:
 def create_person(db_path: str, vorname: str, nachname: str, beihilfesatz: float = 0.0):
     with connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO person (vorname,nachname,beihilfesatz) VALUES (?,?,?)",
+        cursor.execute("INSERT INTO person (vorname,nachname,beihilfesatz) VALUES (?,?,?) RETURNING *",
                        (vorname, nachname, beihilfesatz))
+        return PersonDTO(*cursor.fetchone())
 
 
 def read_person_by_name(db_path: str, vorname: str, nachname: str):

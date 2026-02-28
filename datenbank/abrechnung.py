@@ -63,6 +63,7 @@ def update_abrechnung_beihilfebetrag(db_path: str, abrechnung_id: str, beihilfeb
             "UPDATE abrechnung SET beihilfebetrag = ? WHERE id = ?",
             (beihilfebetrag, abrechnung_id)
         )
+        return AbrechnungDTO(*cursor.fetchone())
 
 
 def update_abrechnung_pkv_betrag(db_path: str, abrechnung_id: str, pkv_betrag: float):
@@ -72,6 +73,7 @@ def update_abrechnung_pkv_betrag(db_path: str, abrechnung_id: str, pkv_betrag: f
             "UPDATE abrechnung SET pkv_betrag = ? WHERE id = ?",
             (pkv_betrag, abrechnung_id)
         )
+        return AbrechnungDTO(*cursor.fetchone())
 
 
 def update_abrechnung_hashwert(db_path: str, abrechnung_id: str, hashwert: str):
@@ -81,6 +83,7 @@ def update_abrechnung_hashwert(db_path: str, abrechnung_id: str, hashwert: str):
             "UPDATE abrechnung SET hashwert = ? WHERE id = ?",
             (hashwert, abrechnung_id)
         )
+        return AbrechnungDTO(*cursor.fetchone())
 
 def delete_abrechung(db_path: str, abrechnung_id: int):
     with(connect(db_path)) as conn:

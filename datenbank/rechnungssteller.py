@@ -18,7 +18,10 @@ class RechnungstellerDTO:
 def create_rechnungssteller(db_path:str, name: str, iban: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO rechnungssteller (name,iban) VALUES (?,?)", (name, iban))
+        cursor.execute(
+            "INSERT INTO rechnungssteller (name,iban) VALUES (?,?) RETURNING *",
+            (name, iban))
+        return RechnungstellerDTO(*cursor.fetchone())
 
 
 def read_rechnungssteller_by_name(db_path:str, name: str) -> RechnungstellerDTO:
@@ -52,4 +55,5 @@ def read_alle_rechnungssteller(db_path):
 def update_iban(db_path:str, name: str, iban: str):
     with connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute("UPDATE rechnungssteller SET iban = ? WHERE name = ?", (iban, name))
+        cursor.execute("UPDATE rechnungssteller SET iban = ? WHERE name = ? RETURNING *", (iban, name))
+        return RechnungstellerDTO(*cursor.fetchone())
